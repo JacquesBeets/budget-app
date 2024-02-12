@@ -32,7 +32,10 @@ func (s *service) GetLatestTransactions() ([]models.Transaction, error) {
 	transactions := []models.Transaction{}
 	currentMonth := time.Now().Format("01") // "01" is the format for two-digit month in Go
 
-	query := `SELECT * FROM transactions WHERE strftime('%m', date(transaction_date)) = ? ORDER BY date(transaction_date) DESC`
+	query := `SELECT * 
+	FROM transactions 
+	WHERE date(transaction_date) >= date('now', 'start of month', '-1 month', '+23 days') 
+	ORDER BY date(transaction_date) DESC;`
 	rows, err := s.db.Query(query, currentMonth)
 	if err != nil {
 		fmt.Println(err)
