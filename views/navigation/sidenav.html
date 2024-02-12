@@ -1,0 +1,23 @@
+<nav class="sideNav">
+    <div class="logo">
+        <a href="/">
+            <img id="crest-clear" src="/static/img/crest-clear.png" alt="Family Crest" />
+        </a>
+    </div>
+
+    <ul class="">
+        <li class="">
+            <a href="/" hx-get="/templates/dashboard" hx-trigger="click" hx-target="#content" hx-swap="innerHTML">Dashboard</a>
+        </li>
+        <li class="">
+            <a href="/upload" hx-get="/templates/upload" hx-trigger="click" hx-target="#content" hx-swap="innerHTML">Budget</a>
+        </li>
+        <li class="">
+            <a href="/upload" hx-get="/templates/upload" hx-trigger="click" hx-target="#content" hx-swap="innerHTML">Upload OFX
+                Data</a>
+        </li>
+        <!-- <li class="">
+            <a href="/" class=""> <small>Version: {{.}}</small></a>
+        </li> -->
+    </ul>
+</nav>

@@ -1,0 +1,22 @@
+<div class="flex justify-center p-6" id="ofxUploads"> 
+    <div class="w-1/2">
+        <form hx-post="/upload/ofx"  hx-target="#ofxUploads" hx-swap="outerHTML" hx-indicator="#spinner" hx-post="true" enctype="multipart/form-data">
+            <div class="flex flex-col space-y-4">
+                <div class="flex flex-col space-y-2">
+                    <label for="ofx" class="text-lg font-bold">Select Bank</label>
+                    <select name="bank" id="bank" class="p-2 border border-gray-300 rounded-md dark:bg-black" required>
+                        <option value="" selected>Choose Bank</option>
+                        <option value="FNB">FNB</option>
+                        <option value="NEDBANK">Nedbank</option>
+                </div>
+                <div class="flex flex-col space-y-2">
+                    <label for="ofx" class="text-lg font-bold">Upload OFX</label>
+                    <input type="file" name="ofx" id="ofx" class="p-2 border border-gray-300 rounded-md" accept=".ofx" required/>
+                </div>
+            </div>
+            <div class="flex justify-center mt-5">
+            </div>
+            <button type="submit" class="p-2 text-white outline rounded-md w-full" >UPLOAD</button>  
+        </form>
+    </div>
+</div>

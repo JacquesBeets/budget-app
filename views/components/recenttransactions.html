@@ -1,0 +1,110 @@
+<div class="recentTransactions border">
+    <h3>
+        Recent Transactions
+        <small class="muted">The recent stransaction total is R {{ .RecentTotal }} out of {{ .TransactionCount
+            }}</small>
+    </h3>
+
+    <ul>
+        {{ range .Transactions }}
+        <li>
+            <h5>
+                {{if .TransactionName}}
+                {{.TransactionName}}
+                {{else}}
+                {{.TransactionMemo}}
+                {{end}}
+                <small class="muted">{{ .BankName }} &bullet; {{formatDate .TransactionDate}}</small>
+            </h5>
+            <span class="">R {{ formatPrice .TransactionAmount }}</span>
+        </li>
+        {{ end }}
+    </ul>
+</div>
+
+<div class="monthlyBudget border">
+    <h3>
+        Monthly Budget
+        <small class="muted">The recent stransaction total is R {{ .BudgetTotal }}</small>
+    </h3>
+
+    <ul>
+        <li>
+            <h5>
+                Goolgle Storage Fee
+                <small class="muted">FNB &bullet; 2024-08-01</small>
+            </h5>
+            <span class="">- R 200.00</span>
+        </li>
+        <li>
+            <h5>
+                Goolgle Storage Fee
+                <small class="muted">FNB &bullet; 2024-08-01</small>
+            </h5>
+            <span class="">- R 200.00</span>
+        </li>
+        <li>
+            <h5>
+                Goolgle Storage Fee
+                <small class="muted">FNB &bullet; 2024-08-01</small>
+            </h5>
+            <span class="">- R 200.00</span>
+        </li>
+        <li>
+            <h5>
+                Goolgle Storage Fee
+                <small class="muted">FNB &bullet; 2024-08-01</small>
+            </h5>
+            <span class="">- R 200.00</span>
+        </li>
+        <li>
+            <h5>
+                Goolgle Storage Fee
+                <small class="muted">FNB &bullet; 2024-08-01</small>
+            </h5>
+            <span class="">- R 200.00</span>
+        </li>
+        <li>
+            <h5>
+                Goolgle Storage Fee
+                <small class="muted">FNB &bullet; 2024-08-01</small>
+            </h5>
+            <span class="">- R 200.00</span>
+        </li>
+        <li>
+            <h5>
+                Goolgle Storage Fee
+                <small class="muted">FNB &bullet; 2024-08-01</small>
+            </h5>
+            <span class="">- R 200.00</span>
+        </li>
+        <li>
+            <h5>
+                Goolgle Storage Fee
+                <small class="muted">FNB &bullet; 2024-08-01</small>
+            </h5>
+            <span class="">- R 200.00</span>
+        </li>
+        <li>
+            <h5>
+                Goolgle Storage Fee
+                <small class="muted">FNB &bullet; 2024-08-01</small>
+            </h5>
+            <span class="">- R 200.00</span>
+        </li>
+        <li>
+            <h5>
+                Goolgle Storage Fee
+                <small class="muted">FNB &bullet; 2024-08-01</small>
+            </h5>
+            <span class="">- R 200.00</span>
+        </li>
+        <li>
+            <h5>
+                Goolgle Storage Fee
+                <small class="muted">FNB &bullet; 2024-08-01</small>
+            </h5>
+            <span class="">- R 200.00</span>
+        </li>
+    </ul>
+</div>

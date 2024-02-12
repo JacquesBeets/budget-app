@@ -1,0 +1,75 @@
+<div class="title"><h1 >Dashboard</h1> <input type="date" name="date" id="date"></div>
+<div class="cards">
+    <div class="card">
+        <div class="cardHead">
+            <h3 class="">Total Income</h3>
+            <span>
+                +
+                <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            </span>
+        </div>
+        <footer class="">
+            <div class="text-2xl">R 60 000</div>
+            <p class="muted"><small>+20.1% from last month</small></p>
+        </footer>
+    </div>
+    <div class="card ">
+        <div class=" cardHead">
+            <h3 class="">Total Spent</h3>
+            <span>
+                -
+                <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            </span>
+        </div>
+        <footer class="">
+            <div class="text-2xl">R 45 000</div>
+            <p class="muted"><small>+180.1% from last month</small></p>
+        </footer>
+    </div>
+    <div class=" card ">
+        <div class="cardHead">
+            <h3 class="">Budget</h3>
+            <span>
+                -
+                <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                <path d="M2 10h20"></path>
+            </svg>
+            </span>
+        </div>
+        <footer class="">
+            <div class="text-2xl">R 43 000</div>
+            <p class="muted"><small>+19% from last month</small></p>
+        </footer>
+    </div>
+    <div class=" card ">
+        <div class=" cardHead">
+            <h3 class="">Total Savings</h3>
+            <span>
+                + 
+                <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
+            </span>
+        </div>
+        <footer class="">
+            <div class="text-2xl">R 200 000</div>
+            <p class="muted"><small>+201 since last hour</small></p>
+        </footer>
+    </div>
+</div>
+
+
+<div class="dashboardContainer" hx-get="/components/transactions" hx-trigger="load" hx-swap="innerHTML"></div>

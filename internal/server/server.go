@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"budget-app/internal/database"
+
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -34,3 +35,4 @@ func NewServer() *http.Server {
 
 	return server
 }
+

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"budget-app/internal/models"
 	"context"
 	"database/sql"
 	"fmt"
@@ -14,6 +15,8 @@ import (
 
 type Service interface {
 	Health() map[string]string
+	SaveMultipleTransactions(transactions []models.Transaction) error
+	GetLatestTransactions() ([]models.Transaction, error)
 }
 
 type service struct {
@@ -31,7 +34,10 @@ func New() Service {
 		// another initialization error.
 		log.Fatal(err)
 	}
+	// db.SetMaxOpenConns(10)
+	// db.SetMaxIdleConns(5)
 	s := &service{db: db}
+	s.CreateTables()
 	return s
 }
 
@@ -48,3 +54,11 @@ func (s *service) Health() map[string]string {
 		"message": "It's healthy",
 	}
 }
+
+func (s *service) CreateTables() {
+	CreateUserTable(service{db: s.db})
+	CreateTransactionTable(service{db: s.db})
+	CreateTransactionTypesTable(service{db: s.db})
+}
+
+
