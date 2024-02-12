@@ -49,6 +49,11 @@ small {
     opacity: 0.5;
 }
 
+.flex {
+    display: flex;
+    align-items: center;
+}
+
 .border{
     border: 1px solid #333;
     border-radius: 0.5rem;
@@ -152,9 +157,12 @@ select {
     padding: 0.5rem;
     border: 1px solid #333;
     border-radius: 0.5rem;
-    margin-bottom: 1rem;
     background-color: #000000;
     color: #ffffff;
+}
+
+label {
+    display: block;
 }
 
 button {
@@ -170,6 +178,14 @@ button {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+}
+
+.profilePic{
+    margin: 0 .4rem 0 0;
+}
+
+.profilePic img{
+    width: 28px;
 }
 
 .recentTransactions,

@@ -31,8 +31,8 @@ func CreateTransactionTable(s service) {
 func (s *service) GetLatestTransactions() ([]models.Transaction, error) {
 	transactions := []models.Transaction{}
 	currentMonth := time.Now().Format("01") // "01" is the format for two-digit month in Go
-	// Prepare the query for getting transactions from the database for the current month
-	query := `select * from transactions where strftime('%m', transaction_date) = ?`
+
+	query := `SELECT * FROM transactions WHERE strftime('%m', date(transaction_date)) = ? ORDER BY date(transaction_date) DESC`
 	rows, err := s.db.Query(query, currentMonth)
 	if err != nil {
 		fmt.Println(err)
@@ -102,7 +102,6 @@ func (s *service) SaveMultipleTransactions(transactions []models.Transaction) er
 		if err != nil {
 			return err
 		}
-		log.Println("TransactionID", len(transactions), transaction.TransactionID, transaction.TransactionDate)
 		if count > 0 {
 			// Transaction already exists, do not add it
 			log.Println("Transaction already exists")

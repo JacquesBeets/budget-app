@@ -24,6 +24,7 @@ const (
 // Components
 const (
 	RecentTransactionComponent = "./views/components/recenttransactions.html"
+	BudgetForm                 = "./views/components/budgetform.html"
 )
 
 func ParseFiles(files ...string) *template.Template {
@@ -92,7 +93,7 @@ func (ge *GinEngine) UploadPageRefreshed(c *gin.Context) {
 func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	r := ge.Router
 	funcMap := template.FuncMap{
-		"formatDate": utils.FormatDate,
+		"formatDate":  utils.FormatDate,
 		"formatPrice": utils.FormatPrice,
 	}
 	r.SetFuncMap(funcMap)
@@ -105,8 +106,6 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(transactions)
-
 	recentTotal := 0.0
 	for _, t := range transactions {
 		recentTotal += float64(t.TransactionAmount)
@@ -118,5 +117,15 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 		"BudgetTotal":      "44300.00",
 		"Transactions":     transactions,
 		"TransactionCount": len(transactions),
+	})
+}
+
+func (ge *GinEngine) ReturnBudgetForm(c *gin.Context) {
+	// single file
+	r := ge.Router
+	r.LoadHTMLFiles(BudgetForm)
+
+	c.HTML(http.StatusOK, "budgetform.html", gin.H{
+		"Version": "1",
 	})
 }

@@ -41,7 +41,6 @@ func NewTransaction(
 
 func GetTransactions() ([]models.Transaction, error) {
 	var dbService database.Service = database.New()
-	fmt.Println("Getting transactions")
 	trns, err := dbService.GetLatestTransactions()
 	if err != nil {
 		return nil, err

@@ -59,6 +59,5 @@ func (s *service) CreateTables() {
 	CreateUserTable(service{db: s.db})
 	CreateTransactionTable(service{db: s.db})
 	CreateTransactionTypesTable(service{db: s.db})
+	CreateBudgetTable(service{db: s.db})
 }
-
-
