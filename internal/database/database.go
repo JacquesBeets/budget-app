@@ -17,6 +17,8 @@ type Service interface {
 	Health() map[string]string
 	SaveMultipleTransactions(transactions []models.Transaction) error
 	GetLatestTransactions() ([]models.Transaction, error)
+	SaveBudgetItem(budget models.Budget) error
+	GetBudget() ([]models.Budget, error)
 }
 
 type service struct {

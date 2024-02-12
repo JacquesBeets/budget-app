@@ -106,17 +106,30 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 		return
 	}
 
+	budetsItems, err := GetBudget()
+	if err != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "views/error.html", gin.H{"error": "could not fetch budget items"})
+		return
+	}
+
 	recentTotal := 0.0
 	for _, t := range transactions {
 		recentTotal += float64(t.TransactionAmount)
 	}
 
+	budgetTotal := 0.0
+	for _, b := range budetsItems {
+		budgetTotal += float64(b.Amount)
+	}
+
 	c.HTML(http.StatusOK, "recenttransactions.html", gin.H{
 		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
 		"RecentTotal":      recentTotal,
-		"BudgetTotal":      "44300.00",
+		"BudgetTotal":      budgetTotal,
 		"Transactions":     transactions,
 		"TransactionCount": len(transactions),
+		"BudgetItems":      budetsItems,
 	})
 }
 

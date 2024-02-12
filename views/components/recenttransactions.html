@@ -35,86 +35,18 @@
     <h3>
         Monthly Budget
         <small class="muted">The recent stransaction total is R {{ .BudgetTotal }}</small>
-        <button hx-get="/components/budget/form" hx-trigger="click" hx-target="#addBudget" hx-swap="innerHTML">+</button>
+        <!-- <button hx-get="/components/budget/form" hx-trigger="click" hx-target="#addBudget" hx-swap="innerHTML">+</button> -->
     </h3>
     <section id="addBudget"></section>
     <ul>
+        {{ range .BudgetItems }}
         <li>
             <h5>
-                Goolgle Storage Fee
+                {{.Name}}
                 <small class="muted">FNB &bullet; 2024-08-01</small>
             </h5>
-            <span class="">- R 200.00</span>
+            <span class="">R {{ formatPrice .Amount }}</span>
         </li>
-        <li>
-            <h5>
-                Goolgle Storage Fee
-                <small class="muted">FNB &bullet; 2024-08-01</small>
-            </h5>
-            <span class="">- R 200.00</span>
-        </li>
-        <li>
-            <h5>
-                Goolgle Storage Fee
-                <small class="muted">FNB &bullet; 2024-08-01</small>
-            </h5>
-            <span class="">- R 200.00</span>
-        </li>
-        <li>
-            <h5>
-                Goolgle Storage Fee
-                <small class="muted">FNB &bullet; 2024-08-01</small>
-            </h5>
-            <span class="">- R 200.00</span>
-        </li>
-        <li>
-            <h5>
-                Goolgle Storage Fee
-                <small class="muted">FNB &bullet; 2024-08-01</small>
-            </h5>
-            <span class="">- R 200.00</span>
-        </li>
-        <li>
-            <h5>
-                Goolgle Storage Fee
-                <small class="muted">FNB &bullet; 2024-08-01</small>
-            </h5>
-            <span class="">- R 200.00</span>
-        </li>
-        <li>
-            <h5>
-                Goolgle Storage Fee
-                <small class="muted">FNB &bullet; 2024-08-01</small>
-            </h5>
-            <span class="">- R 200.00</span>
-        </li>
-        <li>
-            <h5>
-                Goolgle Storage Fee
-                <small class="muted">FNB &bullet; 2024-08-01</small>
-            </h5>
-            <span class="">- R 200.00</span>
-        </li>
-        <li>
-            <h5>
-                Goolgle Storage Fee
-                <small class="muted">FNB &bullet; 2024-08-01</small>
-            </h5>
-            <span class="">- R 200.00</span>
-        </li>
-        <li>
-            <h5>
-                Goolgle Storage Fee
-                <small class="muted">FNB &bullet; 2024-08-01</small>
-            </h5>
-            <span class="">- R 200.00</span>
-        </li>
-        <li>
-            <h5>
-                Goolgle Storage Fee
-                <small class="muted">FNB &bullet; 2024-08-01</small>
-            </h5>
-            <span class="">- R 200.00</span>
-        </li>
+        {{ end }}
     </ul>
 </div>

@@ -50,4 +50,5 @@ func HandleComponents(r *gin.Engine) {
 
 	r.GET("components/transactions", views.HandleTransctions)
 	r.GET("components/budget/form", views.ReturnBudgetForm)
+	r.POST("/budget/add", views.SaveBudgetItem)
 }
