@@ -15,7 +15,6 @@ import (
 
 type Service interface {
 	Health() map[string]string
-	SaveMultipleTransactions(transactions []models.Transaction) error
 	SaveBudgetItem(budget models.Budget) error
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 	GetDBPool() *sql.DB
@@ -69,4 +68,6 @@ func (s *service) CreateTables() {
 	CreateTransactionTable(service{db: s.db})
 	CreateTransactionTypesTable(service{db: s.db})
 	CreateBudgetTable(service{db: s.db})
+	CreateAccountsTable(service{db: s.db})
+	CreateBudgetTransactionsTable(service{db: s.db})
 }

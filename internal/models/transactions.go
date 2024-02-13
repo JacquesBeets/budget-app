@@ -13,6 +13,7 @@ type Transaction struct {
 	TransactionName   string    `json:"transactionName"`
 	TransactionMemo   string    `json:"transactionMemo"`
 	CreatedAt         time.Time `json:"createdAt"`
-	TransactionTypeID int       `json:"transactionTypeID"`
 	BankName          string    `json:"bankName"`
+	TransactionTypeID int       `json:"transactionTypeID"`
+	AccountID         int       `json:"accountID"`
 }
