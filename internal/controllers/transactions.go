@@ -4,6 +4,7 @@ import (
 	"budget-app/internal/database"
 	"budget-app/internal/models"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -115,7 +116,7 @@ func (ge *GinEngine) HandleOFXUpload(c *gin.Context) {
 }
 
 func ParseOFX(filePath, bankName string) error {
-	var dbService database.Service = database.New()
+	dbService := database.New()
 
 	f, err := os.Open(filePath)
 	if err != nil {
@@ -158,11 +159,68 @@ func ParseOFX(filePath, bankName string) error {
 					return err
 				}
 				Transactions = append(Transactions, *trn)
-				if err := dbService.SaveMultipleTransactions(Transactions); err != nil {
+				if err := SaveMultipleTransactions(dbService, Transactions); err != nil {
 					fmt.Printf("could not add transaction: %v", err)
 					return err
 				}
 			}
+		}
+	}
+
+	return nil
+}
+
+func SaveMultipleTransactions(s database.Service, transactions []models.Transaction) error {
+	db := s.GetDBPool()
+
+	// Prepare the query for adding transactions
+	query := `insert into transactions (
+        transaction_type,
+        transaction_date,
+        transaction_amount,
+        transaction_id,
+        transaction_name,
+        transaction_memo,
+        created_at,
+        transaction_type_id,
+        bank_name
+    ) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
+	stmt, err := db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, transaction := range transactions {
+
+		// Check if the transaction already exists
+		existsQuery := `select count(*) from transactions where transaction_id = ?`
+		var count int
+		err = db.QueryRow(existsQuery, transaction.TransactionID).Scan(&count)
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			// Transaction already exists, do not add it
+			log.Println("Transaction already exists")
+			continue
+		}
+
+		_, err = stmt.Exec(
+			transaction.TransactionType,
+			transaction.TransactionDate,
+			transaction.TransactionAmount,
+			transaction.TransactionID,
+			transaction.TransactionName,
+			transaction.TransactionMemo,
+			transaction.CreatedAt,
+			transaction.TransactionTypeID,
+			transaction.BankName,
+		)
+
+		if err != nil {
+			return err
 		}
 	}
 

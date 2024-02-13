@@ -101,7 +101,7 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	r.SetFuncMap(funcMap)
 	r.LoadHTMLFiles(RecentTransactionComponent)
 
-	transactions, err := GetTransactions()
+	transactions, err := GetTransactions(service)
 	if err != nil {
 		r.LoadHTMLFiles(ErrorHTML)
 		c.HTML(http.StatusInternalServerError, "views/error.html", gin.H{"error": "could not fetch transactions"})
@@ -119,10 +119,8 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	}
 
 	budgetTotal := 0.0
-	if budetsItems == nil {
-		for _, b := range budetsItems {
-			budgetTotal += float64(b.Amount)
-		}
+	for _, b := range budetsItems {
+		budgetTotal += float64(b.Amount)
 	}
 
 	c.HTML(http.StatusOK, "recenttransactions.html", gin.H{
