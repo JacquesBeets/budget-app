@@ -16,9 +16,9 @@ import (
 type Service interface {
 	Health() map[string]string
 	SaveMultipleTransactions(transactions []models.Transaction) error
-	GetLatestTransactions() ([]models.Transaction, error)
 	SaveBudgetItem(budget models.Budget) error
-	GetBudget() ([]models.Budget, error)
+	Query(query string, args ...interface{}) (*sql.Rows, error)
+	GetDBPool() *sql.DB
 }
 
 type service struct {
@@ -32,15 +32,22 @@ var (
 func New() Service {
 	db, err := sql.Open("sqlite3", dburl)
 	if err != nil {
-		// This will not be a connection error, but a DSN parse error or
-		// another initialization error.
 		log.Fatal(err)
 	}
-	// db.SetMaxOpenConns(10)
-	// db.SetMaxIdleConns(5)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(5)
 	s := &service{db: db}
 	s.CreateTables()
+	// Returning the service directly (which satisfies the Service interface)
 	return s
+}
+
+func (s *service) GetDBPool() *sql.DB {
+	return s.db
+}
+
+func (s *service) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	return s.db.Query(query, args...)
 }
 
 func (s *service) Health() map[string]string {

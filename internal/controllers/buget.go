@@ -3,6 +3,8 @@ package controllers
 import (
 	"budget-app/internal/database"
 	"budget-app/internal/models"
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -10,11 +12,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetBudget() ([]models.Budget, error) {
-	var dbService database.Service = database.New()
-	budget, err := dbService.GetBudget()
+func GetBudget(s database.Service) ([]models.Budget, error) {
+	db := s.GetDBPool()
+
+	rows, err := db.Query(`
+		SELECT id, name, amount, created_at, transaction_type_id
+		FROM budget;
+	`)
+
 	if err != nil {
+		fmt.Print("Error getting budget:", err)
 		return nil, err
+	}
+	defer rows.Close()
+
+	var budget []models.Budget
+	for rows.Next() {
+		var b models.Budget
+		if err := rows.Scan(&b.ID, &b.Name, &b.Amount, &b.CreatedAt, &b.TransactionTypeID); err != nil {
+			log.Fatalf(fmt.Sprintf("Error scanning budget: %v", err))
+			return nil, err
+		}
+		budget = append(budget, b)
 	}
 	return budget, nil
 }

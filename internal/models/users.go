@@ -6,15 +6,3 @@ type User struct {
 	Password string `json:"password" binding:"required"`
 	Admin    bool   `json:"admin"`
 }
-
-func (u *User) Save() error {
-	return nil
-}
-
-func (u *User) Update() error {
-	return nil
-}
-
-func (u *User) Delete() error {
-	return nil
-}

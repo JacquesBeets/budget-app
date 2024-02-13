@@ -4,7 +4,6 @@ import (
 	"budget-app/internal/models"
 	"fmt"
 	"log"
-	"time"
 )
 
 func CreateTransactionTable(s service) {
@@ -26,54 +25,6 @@ func CreateTransactionTable(s service) {
 	if err != nil {
 		log.Fatalf(fmt.Sprintf("Error creating transactions table: %v", err))
 	}
-}
-
-func (s *service) GetLatestTransactions() ([]models.Transaction, error) {
-	transactions := []models.Transaction{}
-	currentMonth := time.Now().Format("01") // "01" is the format for two-digit month in Go
-
-	query := `SELECT * 
-	FROM transactions 
-	WHERE date(transaction_date) >= date('now', 'start of month', '-1 month', '+23 days') 
-	ORDER BY date(transaction_date) DESC;`
-	rows, err := s.db.Query(query, currentMonth)
-	if err != nil {
-		fmt.Println(err)
-		return transactions, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var transaction models.Transaction
-		var transactionDateString string
-
-		err := rows.Scan(
-			&transaction.ID,
-			&transaction.TransactionType,
-			&transactionDateString,
-			&transaction.TransactionAmount,
-			&transaction.TransactionID,
-			&transaction.TransactionName,
-			&transaction.TransactionMemo,
-			&transaction.CreatedAt,
-			&transaction.BankName,
-			&transaction.TransactionTypeID,
-		)
-		if err != nil {
-			fmt.Println(err)
-			return transactions, err
-		}
-
-		// Parse the date string into a time.Time type
-		transaction.TransactionDate, err = time.Parse("2006-01-02 15:04:05-07:00", transactionDateString)
-		if err != nil {
-			fmt.Println(err)
-			return transactions, err
-		}
-		transactions = append(transactions, transaction)
-	}
-
-	return transactions, nil
 }
 
 func (s *service) SaveMultipleTransactions(transactions []models.Transaction) error {

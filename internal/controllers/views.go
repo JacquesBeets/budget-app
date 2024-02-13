@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"budget-app/internal/database"
 	"budget-app/internal/utils"
 	"fmt"
 	"html/template"
@@ -91,6 +92,7 @@ func (ge *GinEngine) UploadPageRefreshed(c *gin.Context) {
 }
 
 func (ge *GinEngine) HandleTransctions(c *gin.Context) {
+	service := database.New()
 	r := ge.Router
 	funcMap := template.FuncMap{
 		"formatDate":  utils.FormatDate,
@@ -106,11 +108,9 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 		return
 	}
 
-	budetsItems, err := GetBudget()
+	budetsItems, err := GetBudget(service)
 	if err != nil {
-		r.LoadHTMLFiles(ErrorHTML)
-		c.HTML(http.StatusInternalServerError, "views/error.html", gin.H{"error": "could not fetch budget items"})
-		return
+		fmt.Println("Error getting budget items: ", err)
 	}
 
 	recentTotal := 0.0
@@ -119,8 +119,10 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	}
 
 	budgetTotal := 0.0
-	for _, b := range budetsItems {
-		budgetTotal += float64(b.Amount)
+	if budetsItems == nil {
+		for _, b := range budetsItems {
+			budgetTotal += float64(b.Amount)
+		}
 	}
 
 	c.HTML(http.StatusOK, "recenttransactions.html", gin.H{

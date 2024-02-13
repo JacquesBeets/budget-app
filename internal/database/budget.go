@@ -22,29 +22,6 @@ func CreateBudgetTable(s service) {
 	}
 }
 
-func (s *service) GetBudget() ([]models.Budget, error) {
-    rows, err := s.db.Query(`
-        SELECT id, name, amount, created_at, transaction_type_id
-        FROM budget;
-    `)
-    if err != nil {
-        log.Fatalf(fmt.Sprintf("Error getting budget: %v", err))
-        return nil, err
-    }
-    defer rows.Close()
-
-    var budget []models.Budget
-    for rows.Next() {
-        var b models.Budget
-        if err := rows.Scan(&b.ID, &b.Name, &b.Amount, &b.CreatedAt, &b.TransactionTypeID); err != nil {
-            log.Fatalf(fmt.Sprintf("Error scanning budget: %v", err))
-            return nil, err
-        }
-        budget = append(budget, b)
-    }
-    return budget, nil
-}
-
 
 func (s *service) SaveBudgetItem(budget models.Budget) error {
 	_, err := s.db.Exec(`

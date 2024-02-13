@@ -16,17 +16,3 @@ type Transaction struct {
 	TransactionTypeID int       `json:"transactionTypeID"`
 	BankName          string    `json:"bankName"`
 }
-
-func (t *Transaction) Update() error {
-	return nil
-}
-
-func (t *Transaction) Delete() error {
-	return nil
-}
-
-// func (s *database.Service) GetTransactions() ([]Transaction, error) {
-// 	var transactions []Transaction
-// 	s.db.Find(&transactions)
-// 	return transactions, nil
-// }
