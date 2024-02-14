@@ -40,6 +40,51 @@ func NewTransaction(
 	}, nil
 }
 
+func GetAllTransactions(s database.Service) ([]models.Transaction, error) {
+	transactions := []models.Transaction{}
+
+	query := `SELECT * FROM transactions ORDER BY date(transaction_date) DESC;`
+
+	rows, err := s.Query(query)
+	if err != nil {
+		fmt.Println(err)
+		return transactions, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var transaction models.Transaction
+		var transactionDateString string
+
+		err := rows.Scan(
+			&transaction.ID,
+			&transaction.TransactionType,
+			&transactionDateString,
+			&transaction.TransactionAmount,
+			&transaction.TransactionID,
+			&transaction.TransactionName,
+			&transaction.TransactionMemo,
+			&transaction.CreatedAt,
+			&transaction.BankName,
+			&transaction.TransactionTypeID,
+		)
+		if err != nil {
+			fmt.Println(err)
+			return transactions, err
+		}
+
+		// Parse the date string into a time.Time type
+		transaction.TransactionDate, err = time.Parse("2006-01-02 15:04:05-07:00", transactionDateString)
+		if err != nil {
+			fmt.Println(err)
+			return transactions, err
+		}
+		transactions = append(transactions, transaction)
+	}
+
+	return transactions, nil
+}
+
 func GetTransactions(s database.Service) ([]models.Transaction, error) {
 	transactions := []models.Transaction{}
 	currentMonth := time.Now().Format("01") // "01" is the format for two-digit month in Go

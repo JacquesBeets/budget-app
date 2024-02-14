@@ -12,7 +12,7 @@
             </span>
         </div>
         <footer class="">
-            <div class="text-2xl">R 60 000</div>
+            <div class="text-2xl">R {{ formatPrice .TotalIncome }}</div>
             <p class="muted"><small>+20.1% from last month</small></p>
         </footer>
     </div>
@@ -29,7 +29,7 @@
             </span>
         </div>
         <footer class="">
-            <div class="text-2xl">R 45 000</div>
+            <div class="text-2xl">R {{ formatPrice .TotalExpense }}</div>
             <p class="muted"><small>+180.1% from last month</small></p>
         </footer>
     </div>
@@ -47,7 +47,7 @@
             </span>
         </div>
         <footer class="">
-            <div class="text-2xl">R 43 000</div>
+            <div class="text-2xl">R {{ formatPrice .BudgetTotal }}</div>
             <p class="muted"><small>+19% from last month</small></p>
         </footer>
     </div>

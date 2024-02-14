@@ -40,6 +40,7 @@ func HandleViews(r *gin.Engine) {
 	r.GET("/upload", views.UploadPage)
 
 	r.GET("templates/dashboard", views.Dashboard)
+	r.GET("templates/transactions", views.ReturnTransactions)
 
 	// Posts
 	r.POST("/upload/ofx", views.HandleOFXUpload)

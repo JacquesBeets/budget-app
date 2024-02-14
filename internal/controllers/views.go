@@ -20,6 +20,7 @@ const (
 	DashboardHTML   = "./views/dashboard.html"
 	UploadHTML      = "./views/uploads/upload.html"
 	ErrorHTML       = "./views/error.html"
+	Transactions	= "./views/transactions.html"
 )
 
 // Components
@@ -111,6 +112,17 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 		fmt.Println("Error getting budget items: ", err)
 	}
 
+	totalIncome := 0.0
+	totalExpense := 0.0
+	for _, t := range transactions {
+		// if value is positive, it is income
+		if t.TransactionAmount > 0 {
+			totalIncome += float64(t.TransactionAmount)
+		} else {
+			totalExpense += float64(t.TransactionAmount)
+		}
+	}
+
 	recentTotal := 0.0
 	for _, t := range transactions {
 		recentTotal += float64(t.TransactionAmount)
@@ -125,9 +137,35 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
 		"RecentTotal":      recentTotal,
 		"BudgetTotal":      budgetTotal,
+		"TotalIncome":      totalIncome,
+		"TotalExpense":     totalExpense,
 		"Transactions":     transactions,
 		"TransactionCount": len(transactions),
 		"BudgetItems":      budetsItems,
+	})
+}
+
+func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
+	r := ge.Router
+	funcMap := template.FuncMap{
+		"formatDate":  utils.FormatDate,
+		"formatPrice": utils.FormatPrice,
+	}
+	r.SetFuncMap(funcMap)
+	r.LoadHTMLFiles(Transactions)
+	
+	service := database.New()
+	transactions, err := GetAllTransactions(service)
+	if err != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "views/error.html", gin.H{"error": "could not fetch transactions"})
+		return
+	}
+
+	c.HTML(http.StatusOK, "transactions.html", gin.H{
+		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
+		"Transactions":     transactions,
+		"TransactionCount": len(transactions),
 	})
 }
 

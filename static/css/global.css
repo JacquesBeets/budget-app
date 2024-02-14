@@ -221,6 +221,39 @@ button {
     padding: .5rem;
 }
 
+.tableContainer{
+    overflow: hidden;
+    overflow-y: auto;
+    max-height: 750px;
+    border: 1px solid #333;
+    border-radius: 0.5rem;
+}
+
+thead {
+    position: sticky;
+    top: -17px;
+    background-color: #000;
+    border-bottom: 3px solid #333;
+}
+
+table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+
+th{
+    background-color: #000;
+    color: #fff;
+    padding: 1rem;
+}
+
+td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #333;
+}
+
+
 /* Style Scrollbar */
 
 /* For Chrome, Safari, and Opera */
