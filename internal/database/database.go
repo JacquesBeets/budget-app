@@ -17,6 +17,7 @@ type Service interface {
 	Health() map[string]string
 	SaveBudgetItem(budget models.Budget) error
 	Query(query string, args ...interface{}) (*sql.Rows, error)
+	Exec(query string, args ...interface{}) (sql.Result, error)
 	GetDBPool() *sql.DB
 }
 
@@ -47,6 +48,10 @@ func (s *service) GetDBPool() *sql.DB {
 
 func (s *service) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	return s.db.Query(query, args...)
+}
+
+func (s *service) Exec(query string, args ...interface{}) (sql.Result, error) {
+	return s.db.Exec(query, args...)
 }
 
 func (s *service) Health() map[string]string {

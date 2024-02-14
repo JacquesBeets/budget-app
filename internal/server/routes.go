@@ -41,6 +41,7 @@ func HandleViews(r *gin.Engine) {
 
 	r.GET("templates/dashboard", views.Dashboard)
 	r.GET("templates/transactions", views.ReturnTransactions)
+	r.GET("templates/transactionstypes", views.ReturnTransactionTypes)
 
 	// Posts
 	r.POST("/upload/ofx", views.HandleOFXUpload)

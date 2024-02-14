@@ -13,14 +13,15 @@ import (
 
 // Views
 const (
-	IndexHTML       = "./views/index.html"
-	SidenavHTML     = "./views/navigation/sidenav.html"
-	BodyImportsHTML = "./views/imports/bodyimports.html"
-	HeadImportsHTML = "./views/imports/headimports.html"
-	DashboardHTML   = "./views/dashboard.html"
-	UploadHTML      = "./views/uploads/upload.html"
-	ErrorHTML       = "./views/error.html"
-	Transactions	= "./views/transactions.html"
+	IndexHTML        = "./views/index.html"
+	SidenavHTML      = "./views/navigation/sidenav.html"
+	BodyImportsHTML  = "./views/imports/bodyimports.html"
+	HeadImportsHTML  = "./views/imports/headimports.html"
+	DashboardHTML    = "./views/dashboard.html"
+	UploadHTML       = "./views/uploads/upload.html"
+	ErrorHTML        = "./views/error.html"
+	Transactions     = "./views/transactions.html"
+	TransactionTypes = "./views/transaction_types.html"
 )
 
 // Components
@@ -153,7 +154,7 @@ func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
 	}
 	r.SetFuncMap(funcMap)
 	r.LoadHTMLFiles(Transactions)
-	
+
 	service := database.New()
 	transactions, err := GetAllTransactions(service)
 	if err != nil {
@@ -166,6 +167,25 @@ func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
 		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
 		"Transactions":     transactions,
 		"TransactionCount": len(transactions),
+	})
+}
+
+func (ge *GinEngine) ReturnTransactionTypes(c *gin.Context) {
+	r := ge.Router
+	r.LoadHTMLFiles(TransactionTypes)
+
+	service := database.New()
+	transactionTypes, err := GetTransactionsTypes(service)
+	if err != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch transaction types"})
+		return
+	}
+
+	c.HTML(http.StatusOK, "transaction_types.html", gin.H{
+		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
+		"TransactionTypes": transactionTypes,
+		"TransactionCount": len(transactionTypes),
 	})
 }
 
