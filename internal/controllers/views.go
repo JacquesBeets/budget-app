@@ -53,9 +53,9 @@ func (ge *GinEngine) HomePage(c *gin.Context) {
 func (ge *GinEngine) Dashboard(c *gin.Context) {
 	r := ge.Router
 
-	tmpl := ParseFiles(DashboardHTML)
+	// tmpl := ParseFiles(DashboardHTML)
 
-	r.SetHTMLTemplate(tmpl)
+	r.LoadHTMLFiles(DashboardHTML)
 
 	c.HTML(http.StatusOK, "dashboard.html", gin.H{
 		"Now": time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
@@ -69,9 +69,7 @@ func ReturnUploadTemp() *template.Template {
 func (ge *GinEngine) UploadPage(c *gin.Context) {
 	r := ge.Router
 
-	tmpl := ReturnUploadTemp()
-
-	r.SetHTMLTemplate(tmpl)
+	r.LoadHTMLFiles(UploadHTML)
 
 	c.HTML(http.StatusOK, "upload.html", gin.H{
 		"now": time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),

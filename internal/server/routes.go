@@ -12,6 +12,7 @@ var GinEngineVar *gin.Engine
 func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
 	GinEngineVar = r
+
 	// handle static files
 	r.Static("/static", "./static")
 

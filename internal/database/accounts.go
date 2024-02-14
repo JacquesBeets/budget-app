@@ -8,13 +8,13 @@ import (
 )
 
 func CreateAccountsTable(s service) {
-    _, err := s.db.Exec(`
+	_, err := s.db.Exec(`
         DROP TABLE IF EXISTS accounts;
     `)
-    
-    if err != nil {
-        log.Fatalf(fmt.Sprintf("Error dropping accounts table: %v", err))
-    }
+
+	if err != nil {
+		log.Fatalf(fmt.Sprintf("Error dropping accounts table: %v", err))
+	}
 
 	_, err = s.db.Exec(`
         CREATE TABLE IF NOT EXISTS accounts (
@@ -38,25 +38,25 @@ func SeedAccountsTable(s service) {
 		{
 			AccountName: "FNB Checque",
 			AccountType: "checking",
-			Balance:     1000.00,
+			Balance:     16400.89,
 			CreatedAt:   time.Now(),
 		},
 		{
 			AccountName: "FNB Savings",
 			AccountType: "savings",
-			Balance:     5000.00,
+			Balance:     534.00,
 			CreatedAt:   time.Now(),
 		},
 		{
 			AccountName: "NEDBANK Checque",
 			AccountType: "checking",
-			Balance:     1000.00,
+			Balance:     5284.71,
 			CreatedAt:   time.Now(),
 		},
 		{
 			AccountName: "NEDBANK Savings",
 			AccountType: "savings",
-			Balance:     5000.00,
+			Balance:     204913.04,
 			CreatedAt:   time.Now(),
 		},
 	}

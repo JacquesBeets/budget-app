@@ -37,7 +37,7 @@ func New() Service {
 	db.SetMaxIdleConns(5)
 	s := &service{db: db}
 	s.CreateTables()
-	// Returning the service directly (which satisfies the Service interface)
+
 	return s
 }
 
