@@ -1,58 +1,60 @@
 <div class="title"><h1>Transactions</h1></div>
 <div class="tableContainer">
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Amount</th>
-                <th>Bank</th>
-                <th>Transaction Memo</th>
-                <th>Transaction Type</th>
-                <th>Budget Item</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{ range .Transactions }}
-            <tr>
-                <td>{{ formatDate .TransactionDate }}</td>
-                <td>R {{ formatPrice .TransactionAmount }}</td>
-                <td>{{ .BankName }}</td>
-                <td> 
-                    {{if .TransactionName}}
-                    {{.TransactionName}}
-                    {{else}}
-                    {{.TransactionMemo}}
-                    {{end}}</td>
-                <td>
-                    <select name="" id="">
-                        <option value="income">Food</option>
-                        <option value="expense">Clothing</option>
-                        <option value="expense">Entertainment</option>
-                        <option value="expense">Transport</option>
-                        <option value="expense">Medical</option>
-                        <option value="expense">Insurance</option>
-                        <option value="expense">Utilities</option>
-                        <option value="expense">Rent</option>
-                        <option value="expense">Other</option>
-                    </select>
-                </td>
-                <td>
-                    <select name="" id="">
-                        <option value="income">Food</option>
-                        <option value="expense">Clothing</option>
-                        <option value="expense">Entertainment</option>
-                        <option value="expense">Transport</option>
-                        <option value="expense">Medical</option>
-                        <option value="expense">Insurance</option>
-                        <option value="expense">Utilities</option>
-                        <option value="expense">Rent</option>
-                        <option value="expense">Other</option>
-                    </select>
-                </td>
-            </tr>
-            {{ end }}
-        </tbody>
-    </table>
+    <div class="border">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Bank</th>
+                    <th>Transaction Memo</th>
+                    <th>Transaction Type</th>
+                    <th>Budget Item</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Transactions }}
+                <tr>
+                    <td>{{ formatDate .TransactionDate }}</td>
+                    <td>R {{ formatPrice .TransactionAmount }}</td>
+                    <td>{{ .BankName }}</td>
+                    <td> 
+                        {{if .TransactionName}}
+                        {{.TransactionName}}
+                        {{else}}
+                        {{.TransactionMemo}}
+                        {{end}}</td>
+                    <td>
+                        <select name="" id="">
+                            <option value="income">Food</option>
+                            <option value="expense">Clothing</option>
+                            <option value="expense">Entertainment</option>
+                            <option value="expense">Transport</option>
+                            <option value="expense">Medical</option>
+                            <option value="expense">Insurance</option>
+                            <option value="expense">Utilities</option>
+                            <option value="expense">Rent</option>
+                            <option value="expense">Other</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="" id="">
+                            <option value="income">Food</option>
+                            <option value="expense">Clothing</option>
+                            <option value="expense">Entertainment</option>
+                            <option value="expense">Transport</option>
+                            <option value="expense">Medical</option>
+                            <option value="expense">Insurance</option>
+                            <option value="expense">Utilities</option>
+                            <option value="expense">Rent</option>
+                            <option value="expense">Other</option>
+                        </select>
+                    </td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
     
     <h2>Add Transaction</h2>
     

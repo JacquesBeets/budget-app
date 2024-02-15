@@ -69,7 +69,7 @@ small {
 
 nav.sideNav {
     border-right: 1px solid #333;
-    flex: 0 0 15%;
+    flex: 0 0 11%;
 }
 
 .sideNav .logo {
@@ -84,7 +84,7 @@ img {
 
 
 #content {
-    flex: 0 0 85%;
+    flex: 0 0 89%;
     overflow: hidden;
     /* overflow-y: auto; */
 }
@@ -225,8 +225,6 @@ button {
     overflow: hidden;
     overflow-y: auto;
     max-height: 750px;
-    border: 1px solid #333;
-    border-radius: 0.5rem;
 }
 
 thead {
