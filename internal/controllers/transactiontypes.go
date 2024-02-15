@@ -23,6 +23,7 @@ func GetTransactionsTypes(s database.Service) ([]models.TransactionType, error) 
 			&transactionType.ID,
 			&transactionType.Title,
 			&transactionType.Category,
+			&transactionType.CreatedAt,
 		)
 		if err != nil {
 			return transactionTypes, err
@@ -34,23 +35,22 @@ func GetTransactionsTypes(s database.Service) ([]models.TransactionType, error) 
 	return transactionTypes, nil
 }
 
-func CreateTransactionType(s database.Service) (models.TransactionType, error) {
-	transactionType := models.TransactionType{}
+func CreateTransactionType(s database.Service, tnt models.TransactionType) (models.TransactionType, error) {
 
 	query := `INSERT INTO transactions_types (title, category) VALUES (?, ?);`
 
-	result, err := s.Exec(query, transactionType.Title, transactionType.Category)
+	result, err := s.Exec(query, tnt.Title, tnt.Category)
 	if err != nil {
-		return transactionType, err
+		return tnt, err
 	}
 
 	lastId, err := result.LastInsertId()
 	if err != nil {
-		return transactionType, err
+		return tnt, err
 	}
-	transactionType.ID = int(lastId)
+	tnt.ID = int(lastId)
 
-	return transactionType, nil
+	return tnt, nil
 }
 
 func UpdateTransactionType(s database.Service, trtID int) (models.TransactionType, error) {

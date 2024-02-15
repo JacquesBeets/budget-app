@@ -1,35 +1,24 @@
 <div class="title"><h1>Transactions Types</h1></div>
 
-<section class="dashboardContainer">
+<section id="transTypeList" class="dashboardContainer">
     <div class="recentTransactions border">
         <h3>
-            Recent Transactions
+            Transaction Types
             <small class="muted">The recent stransaction total is...</small>
         </h3>
-    
-        <ul>
-            <!-- {{ range .TransactionsTypes }}
+        <ul >
+            {{ range .TransactionTypes }}
             <li>
                 <span class="flex">
-                    <span class="profilePic">
-                        {{if eq .BankName "FNB"}}
-                        <img src="/static/img/fnb.png" alt="FNB">
-                        {{else}}
-                        <img src="/static/img/nedbank.png" alt="NEDBANK">
-                        {{end}}
-                    </span>
                     <h5 class="uppercase">
-                        {{if .TransactionName}}
-                        {{.TransactionName}}
-                        {{else}}
-                        {{.TransactionMemo}}
-                        {{end}}
-                        <small class="muted">{{ .BankName }} &bullet; {{formatDate .TransactionDate}}</small>
+                        
+                        {{ .Title}}
+                        <small class="muted">Some more text here</small>
                     </h5>
                 </span>
-                <span class="">R {{ formatPrice .TransactionAmount }}</span>
+                <span class="">DELETE</span>
             </li>
-            {{ end }} -->
+            {{ end }}
         </ul>
     </div>
     
@@ -37,12 +26,13 @@
         <h3>
             Add/View Transaction Type
             <small class="muted">Some text can go here...</small>
-            <!-- <button hx-get="/components/budget/form" hx-trigger="click" hx-target="#addBudget" hx-swap="innerHTML">+</button> -->
         </h3>
         <section id="addBudget"></section>
-        <form>
+        <form hx-post="/transactionstypes/add" hx-target="#content" hx-swap="innerHTML">
             <label for="type">Type:</label>
-            <input type="text" id="type" name="type">
+            <input type="text" id="type" name="title" required>
+            <label for="category">Category:</label>
+            <input type="text" id="category" name="category" placeholder="new dbtable maybe?">
             <button type="submit">Add</button>
         </form>
     </div>

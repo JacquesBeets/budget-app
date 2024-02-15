@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"budget-app/internal/database"
+	"budget-app/internal/models"
 	"budget-app/internal/utils"
 	"fmt"
 	"html/template"
@@ -172,6 +173,12 @@ func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
 
 func (ge *GinEngine) ReturnTransactionTypes(c *gin.Context) {
 	r := ge.Router
+
+	funcMap := template.FuncMap{
+		"formatDate":  utils.FormatDate,
+		"formatPrice": utils.FormatPrice,
+	}
+	r.SetFuncMap(funcMap)
 	r.LoadHTMLFiles(TransactionTypes)
 
 	service := database.New()
@@ -186,6 +193,41 @@ func (ge *GinEngine) ReturnTransactionTypes(c *gin.Context) {
 		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
 		"TransactionTypes": transactionTypes,
 		"TransactionCount": len(transactionTypes),
+	})
+}
+
+func (ge *GinEngine) HandleTransactionTypeCreate(c *gin.Context) {
+	r := ge.Router
+	funcMap := template.FuncMap{
+		"formatDate":  utils.FormatDate,
+		"formatPrice": utils.FormatPrice,
+	}
+	r.SetFuncMap(funcMap)
+	r.LoadHTMLFiles(TransactionTypes)
+
+	service := database.New()
+	transactionType := models.TransactionType{}
+	transactionType.Title = c.PostForm("title")
+	transactionType.Category = c.PostForm("category")
+
+	transactionType, err := CreateTransactionType(service, transactionType)
+	if err != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not create transaction type"})
+		return
+	}
+
+	transactionTypes, err := GetTransactionsTypes(service)
+	if err != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch transaction types"})
+		return
+	}
+
+	c.HTML(http.StatusOK, "transaction_types.html", gin.H{
+		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
+		"TransactionTypes": transactionTypes,
+		"TransactionCount": 1,
 	})
 }
 
