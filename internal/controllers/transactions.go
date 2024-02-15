@@ -271,3 +271,15 @@ func SaveMultipleTransactions(s database.Service, transactions []models.Transact
 
 	return nil
 }
+
+func LinkTransactionType(s database.Service, transactionID string, transactionTypeID string) error {
+	query := `UPDATE transactions SET transaction_type_id = ? WHERE id = ?;`
+
+	_, err := s.Exec(query, transactionTypeID, transactionID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}

@@ -13,28 +13,24 @@
                 </tr>
             </thead>
             <tbody>
-                {{ range .Transactions }}
+                {{ range .TransactionsData }}
                 <tr>
-                    <td>{{ formatDate .TransactionDate }}</td>
-                    <td>R {{ formatPrice .TransactionAmount }}</td>
-                    <td>{{ .BankName }}</td>
+                    <td>{{ formatDate .Transaction.TransactionDate }}</td>
+                    <td>R {{ formatPrice .Transaction.TransactionAmount }}</td>
+                    <td>{{ .Transaction.BankName }}</td>
                     <td> 
-                        {{if .TransactionName}}
-                        {{.TransactionName}}
+                        {{if .Transaction.TransactionName}}
+                        {{.Transaction.TransactionName}}
                         {{else}}
-                        {{.TransactionMemo}}
+                        {{.Transaction.TransactionMemo}}
                         {{end}}</td>
                     <td>
-                        <select name="" id="">
-                            <option value="income">Food</option>
-                            <option value="expense">Clothing</option>
-                            <option value="expense">Entertainment</option>
-                            <option value="expense">Transport</option>
-                            <option value="expense">Medical</option>
-                            <option value="expense">Insurance</option>
-                            <option value="expense">Utilities</option>
-                            <option value="expense">Rent</option>
-                            <option value="expense">Other</option>
+                        {{ $currentTransaction := .Transaction }} <!-- Keep a reference to the current Transaction -->
+                        <select name="transactionTypeID" id="transactionTypeSelect" hx-post="/transactions/{{ .Transaction.ID }}/transactionstypes/add" hx-trigger="change">
+                            <option value="" disabled selected>Select</option>
+                            {{ range .TransactionTypes }}
+                            <option value="{{ .ID }}" {{ if eq .ID $currentTransaction.TransactionTypeID }}selected{{ end }}>{{ .Title }}</option>
+                            {{ end }}
                         </select>
                     </td>
                     <td>

@@ -160,13 +160,34 @@ func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
 	transactions, err := GetAllTransactions(service)
 	if err != nil {
 		r.LoadHTMLFiles(ErrorHTML)
-		c.HTML(http.StatusInternalServerError, "views/error.html", gin.H{"error": "could not fetch transactions"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not fetch transactions"})
 		return
+	}
+
+	transactionTypes, err := GetTransactionsTypes(service)
+	if err != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not fetch transaction types"})
+		return
+	}
+
+	type TransactionData struct {
+		Transaction      models.Transaction
+		TransactionTypes []models.TransactionType
+	}
+
+	data := []TransactionData{}
+
+	for _, transaction := range transactions {
+		data = append(data, TransactionData{
+			Transaction:      transaction,
+			TransactionTypes: transactionTypes,
+		})
 	}
 
 	c.HTML(http.StatusOK, "transactions.html", gin.H{
 		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
-		"Transactions":     transactions,
+		"TransactionsData": data,
 		"TransactionCount": len(transactions),
 	})
 }
@@ -185,7 +206,7 @@ func (ge *GinEngine) ReturnTransactionTypes(c *gin.Context) {
 	transactionTypes, err := GetTransactionsTypes(service)
 	if err != nil {
 		r.LoadHTMLFiles(ErrorHTML)
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch transaction types"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not fetch transaction types"})
 		return
 	}
 
@@ -213,14 +234,14 @@ func (ge *GinEngine) HandleTransactionTypeCreate(c *gin.Context) {
 	transactionType, err := CreateTransactionType(service, transactionType)
 	if err != nil {
 		r.LoadHTMLFiles(ErrorHTML)
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not create transaction type"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create transaction type"})
 		return
 	}
 
 	transactionTypes, err := GetTransactionsTypes(service)
 	if err != nil {
 		r.LoadHTMLFiles(ErrorHTML)
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch transaction types"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not fetch transaction types"})
 		return
 	}
 
@@ -228,6 +249,34 @@ func (ge *GinEngine) HandleTransactionTypeCreate(c *gin.Context) {
 		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
 		"TransactionTypes": transactionTypes,
 		"TransactionCount": 1,
+	})
+}
+
+func (ge *GinEngine) TransactionsAddTransactionType(c *gin.Context) {
+	r := ge.Router
+	funcMap := template.FuncMap{
+		"formatDate":  utils.FormatDate,
+		"formatPrice": utils.FormatPrice,
+	}
+	r.SetFuncMap(funcMap)
+	r.LoadHTMLFiles(Transactions)
+
+	service := database.New()
+	transactionID := c.Param("id")
+	transactionTypeID := c.PostForm("transactionTypeID")
+
+	err := LinkTransactionType(service, transactionID, transactionTypeID)
+
+	if err != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "could not add transaction type to transaction",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "ok",
 	})
 }
 
