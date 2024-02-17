@@ -2,63 +2,58 @@ package database
 
 import (
 	"budget-app/internal/models"
-	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	_ "github.com/joho/godotenv/autoload"
 	_ "github.com/mattn/go-sqlite3"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-type Service interface {
-	Health() map[string]string
-	SaveBudgetItem(budget models.Budget) error
-	Query(query string, args ...interface{}) (*sql.Rows, error)
-	Exec(query string, args ...interface{}) (sql.Result, error)
-	GetDBPool() *sql.DB
-}
-
-type service struct {
-	db *sql.DB
+type Service struct {
+	db *gorm.DB
 }
 
 var (
-	dburl = os.Getenv("DB_URL")
+	dburl     = os.Getenv("DB_URL")
+	ServiceDB *gorm.DB
 )
 
-func New() Service {
-	db, err := sql.Open("sqlite3", dburl)
+func New() *Service {
+	// db, err := sql.Open("sqlite3", dburl)
+	log.Println("New() is being called")
+	db, err := gorm.Open(sqlite.Open(dburl), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(5)
-	s := &service{db: db}
-	s.CreateTables()
 
+	s := &Service{db: db}
+	// s.CreateTables()
+	ServiceDB = db
+	s.RunMigrations()
+	log.Println("New() completed successfully")
 	return s
 }
 
-func (s *service) GetDBPool() *sql.DB {
-	return s.db
+func ReturnDB() *gorm.DB {
+	if ServiceDB == nil {
+		log.Println("ReturnDB() is returning nil")
+	}
+	return ServiceDB
 }
 
-func (s *service) Query(query string, args ...interface{}) (*sql.Rows, error) {
-	return s.db.Query(query, args...)
-}
+// func (s *service) Query(query string, args ...interface{}) (*sql.Rows, error) {
+// 	return s.db.Query(query, args...)
+// }
 
-func (s *service) Exec(query string, args ...interface{}) (sql.Result, error) {
-	return s.db.Exec(query, args...)
-}
+// func (s *service) Exec(query string, args ...interface{}) (sql.Result, error) {
+// 	return s.db.Exec(query, args...)
+// }
 
-func (s *service) Health() map[string]string {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
-
-	err := s.db.PingContext(ctx)
+func (s *Service) Health() map[string]string {
+	err := s.db.Exec("SELECT 1").Error
 	if err != nil {
 		log.Fatalf(fmt.Sprintf("db down: %v", err))
 	}
@@ -68,11 +63,16 @@ func (s *service) Health() map[string]string {
 	}
 }
 
-func (s *service) CreateTables() {
-	CreateUserTable(service{db: s.db})
-	CreateTransactionTable(service{db: s.db})
-	CreateTransactionTypesTable(service{db: s.db})
-	CreateBudgetTable(service{db: s.db})
-	CreateAccountsTable(service{db: s.db})
-	CreateBudgetTransactionsTable(service{db: s.db})
+// func (s *Service) CreateTables() {
+// 	CreateUserTable(service{db: s.db})
+// 	CreateTransactionTable(service{db: s.db})
+// 	CreateTransactionTypesTable(service{db: s.db})
+// 	CreateBudgetTable(service{db: s.db})
+// 	CreateAccountsTable(service{db: s.db})
+// 	CreateBudgetTransactionsTable(service{db: s.db})
+// }
+
+func (s *Service) RunMigrations() {
+	models := models.RegisteredModels
+	s.db.AutoMigrate(models...)
 }

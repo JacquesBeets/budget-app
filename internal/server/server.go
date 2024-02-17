@@ -22,7 +22,7 @@ func NewServer() *http.Server {
 	newDB := database.New()
 	NewServer := &Server{
 		port: port,
-		db:   newDB,
+		db:   *newDB, // Fix: Pass the value of newDB instead of its pointer
 	}
 
 	// Declare Server config

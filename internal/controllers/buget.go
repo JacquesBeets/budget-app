@@ -4,85 +4,113 @@ import (
 	"budget-app/internal/database"
 	"budget-app/internal/models"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetBudget(s database.Service) ([]models.Budget, error) {
-	db := s.GetDBPool()
+// func GetBudgetItems(s database.Service) ([]models.Budget, error) {
+// 	db := s.GetDBPool()
 
-	rows, err := db.Query(`
-		SELECT id, name, amount, created_at, transaction_type_id
-		FROM budget;
-	`)
+// 	// rows, err := db.Query(`
+// 	// 	SELECT id, name, amount, created_at, transaction_type_id
+// 	// 	FROM budget;
+// 	// `)
 
-	if err != nil {
-		fmt.Print("Error getting budget:", err)
-		return nil, err
-	}
-	defer rows.Close()
+// 	stringQ := `SELECT b.id, b.name, b.amount, b.created_at, t.id, t.transaction_type, t.transaction_date, t.transaction_amount, t.transaction_id, t.transaction_name, t.transaction_memo, t.created_at, t.bank_name, t.transaction_type_id FROM budget b LEFT JOIN budget_transactions bt ON b.id = bt.budget_id LEFT JOIN transactions t ON bt.transaction_id = t.id`
 
-	var budget []models.Budget
-	for rows.Next() {
-		var b models.Budget
-		if err := rows.Scan(&b.ID, &b.Name, &b.Amount, &b.CreatedAt, &b.TransactionTypeID); err != nil {
-			log.Fatalf(fmt.Sprintf("Error scanning budget: %v", err))
-			return nil, err
-		}
-		budget = append(budget, b)
-	}
-	return budget, nil
-}
+// 	rows, err := db.Query(stringQ)
 
-func NewBudget(
-	name string,
-	amount float64,
-	transactionTypeID int,
-) (*models.Budget, error) {
+// 	if err != nil {
+// 		fmt.Print("Error getting budget:", err)
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
 
-	return &models.Budget{
-		Name:              name,
-		Amount:            amount,
-		TransactionTypeID: transactionTypeID,
-		CreatedAt:         time.Now().UTC(),
-	}, nil
-}
+// 	var budgets []models.Budget
+// 	// for rows.Next() {
+// 	// 	var b models.Budget
+// 	// 	if err := rows.Scan(&b.ID, &b.Name, &b.Amount, &b.CreatedAt, &b.TransactionTypeID); err != nil {
+// 	// 		log.Fatalf(fmt.Sprintf("Error scanning budget: %v", err))
+// 	// 		return nil, err
+// 	// 	}
+// 	// 	budgets = append(budget, b)
+// 	// }
+// 	var currentBudgetID int
+// 	var currentBudget *models.Budget
+// 	var budgetName string
+// 	var budgetAmount float64
+// 	var budgetCreatedAt time.Time
+
+// 	for rows.Next() {
+// 		var budgetID int
+// 		var transaction models.Transaction
+// 		err := rows.Scan(&budgetID, &budgetName, &budgetAmount, &budgetCreatedAt, &transaction.ID, &transaction.TransactionType, &transaction.TransactionDate, &transaction.TransactionAmount, &transaction.TransactionID, &transaction.TransactionName, &transaction.TransactionMemo, &transaction.CreatedAt, &transaction.BankName, &transaction.TransactionTypeID)
+
+// 		if err != nil {
+// 			log.Fatalf(fmt.Sprintf("Error scanning budget: %v", err))
+// 			return nil, err
+// 		}
+
+// 		fmt.Println("budgetID: ", budgetID, "currentBudgetID: ", currentBudgetID, "budgetName: ", budgetName, "budgetAmount: ", budgetAmount, "budgetCreatedAt: ", budgetCreatedAt, "transaction.ID: ", transaction.ID, "transaction.TransactionType: ", transaction.TransactionType, "transaction.TransactionDate: ", transaction.TransactionDate, "transaction.TransactionAmount: ", transaction.TransactionAmount, "transaction.TransactionID: ", transaction.TransactionID, "transaction.TransactionName: ", transaction.TransactionName, "transaction.TransactionMemo: ", transaction.TransactionMemo, "transaction.CreatedAt: ", transaction.CreatedAt, "transaction.BankName: ", transaction.BankName, "transaction.TransactionTypeID: ", transaction.TransactionTypeID)
+
+// 		if currentBudgetID != budgetID {
+// 			currentBudget = &models.Budget{
+// 				ID:           budgetID,
+// 				Name:         budgetName,
+// 				Amount:       budgetAmount,
+// 				CreatedAt:    budgetCreatedAt,
+// 				Transactions: []models.Transaction{},
+// 			}
+// 			budgets = append(budgets, *currentBudget)
+// 			currentBudgetID = budgetID
+// 		}
+// 		if transaction.ID.Valid {
+// 			currentBudget.Transactions = append(currentBudget.Transactions, transaction)
+// 		}
+// 	}
+// 	return budgets, nil
+// }
+
+// func NewBudget(
+// 	name string,
+// 	amount float64,
+// 	transactionTypeID int,
+// ) (*models.Budget, error) {
+
+// 	return &models.Budget{
+// 		Name:              name,
+// 		Amount:            amount,
+// 		TransactionTypeID: transactionTypeID,
+// 		CreatedAt:         time.Now().UTC(),
+// 	}, nil
+// }
 
 func (ge *GinEngine) SaveBudgetItem(c *gin.Context) {
-	var dbService database.Service = database.New()
+	dbService := database.ReturnDB()
 	var budget *models.Budget
 
 	name := c.PostForm("name")
 	amountStr := c.PostForm("amount")
-	transactionTypeIDStr := "1"
 
 	// Convert amount to float64
 	amount, err := strconv.ParseFloat(amountStr, 64)
 	if err != nil {
+		fmt.Println("Error converting amount to float64: ", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid amount"})
 		return
 	}
 
-	// Convert transactionTypeID to int
-	transactionTypeID, err := strconv.Atoi(transactionTypeIDStr)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid transaction type ID"})
-		return
+	budget = &models.Budget{
+		Name:   name,
+		Amount: amount,
 	}
 
-	budget, err = NewBudget(name, amount, transactionTypeID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Error creating budget"})
-		return
-	}
-
-	err = dbService.SaveBudgetItem(*budget)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Error saving budget"})
+	response := dbService.Create(budget).Scan(&budget)
+	if response.Error != nil {
+		fmt.Println("Error saving budget: ", response.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not save budget"})
 		return
 	}
 

@@ -1,11 +1,17 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Budget struct {
-	ID                int       `json:"id"`
-	Name              string    `json:"name"`
-	Amount            float64   `json:"amount"`
-	CreatedAt         time.Time `json:"createdAt"`
-	TransactionTypeID int       `json:"transactionTypeID"`
+	gorm.Model
+	ID           uint          `gorm:"primaryKey" json:"id"`
+	Name         string        `json:"name"`
+	Amount       float64       `json:"amount"`
+	Transactions []Transaction `gorm:"foreignKey:BudgetID" json:"transactions"`
+	CreatedAt    time.Time     // Automatically managed by GORM for creation time
+	UpdatedAt    time.Time     // Automatically managed by GORM for creation time
 }

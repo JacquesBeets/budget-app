@@ -209,7 +209,7 @@ button {
 
 .recentTransactions ul,
 .monthlyBudget ul{
-    max-height: 470px;
+    max-height: 550px;
     overflow: hidden;
     overflow-y: auto;
 }

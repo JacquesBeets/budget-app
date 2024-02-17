@@ -47,6 +47,7 @@ func HandleViews(r *gin.Engine) {
 	r.POST("/upload/ofx", views.HandleOFXUpload)
 	r.POST("/transactionstypes/add", views.HandleTransactionTypeCreate)
 	r.POST("/transactions/:id/transactionstypes/add", views.TransactionsAddTransactionType)
+	r.POST("/transactions/:id/budgetitems/add", views.BudgetTransactionAdd)
 
 }
 

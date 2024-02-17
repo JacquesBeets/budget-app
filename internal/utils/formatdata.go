@@ -2,13 +2,43 @@ package utils
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
 )
 
+func StringToUint(s string) uint {
+	i, _ := strconv.ParseUint(s, 10, 64)
+	return uint(i)
+}
+
+func DereferenceUintPtr(ptr *uint) uint {
+    if ptr == nil {
+        return 0 // or any default value you prefer for nil pointers
+    }
+    return *ptr
+}
+
+func IsNil(i interface{}) bool {
+	if i == nil {
+		return true
+	}
+	value := reflect.ValueOf(i)
+	return value.Kind() == reflect.Ptr && value.IsNil()
+}
+
+func CheckType(v interface{}) reflect.Type {
+	fmt.Println(reflect.TypeOf(v))
+	return reflect.TypeOf(v)
+}
+
 func FormatDate(t time.Time) string {
 	return t.Format("2006-01-02") // Change this to your desired format
+}
+
+func IsEmpty(s string) bool {
+	return len(s) == 0
 }
 
 func FormatPrice(p float64) string {

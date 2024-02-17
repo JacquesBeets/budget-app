@@ -48,7 +48,7 @@
         </div>
         <footer class="">
             <div class="text-2xl">R {{ formatPrice .BudgetTotal }}</div>
-            <p class="muted"><small>+19% from last month</small></p>
+            <p class="muted"><small>Current budget spend is: R {{ formatPrice .BudgetSpent }}</small></p>
         </footer>
     </div>
     <div class=" card ">
@@ -92,15 +92,17 @@
                         {{end}}
                     </span>
                     <h5 class="uppercase">
-                        {{if .TransactionName}}
-                        {{.TransactionName}}
+                        {{if isEmpty .TransactionMemo }}
+                            {{.TransactionName}}
                         {{else}}
-                        {{.TransactionMemo}}
+                            {{.TransactionMemo}}
                         {{end}}
                         <small class="muted">{{ .BankName }} &bullet; {{formatDate .TransactionDate}}</small>
                     </h5>
                 </span>
-                <span class="">R {{ formatPrice .TransactionAmount }}</span>
+                <span class="">
+                    R {{ formatPrice .TransactionAmount }}
+                </span>
             </li>
             {{ end }}
         </ul>
@@ -109,8 +111,8 @@
     <div class="monthlyBudget border">
         <h3>
             Monthly Budget
-            <small class="muted">The recent stransaction total is R {{ .BudgetTotal }}</small>
-            <!-- <button hx-get="/components/budget/form" hx-trigger="click" hx-target="#addBudget" hx-swap="innerHTML">+</button> -->
+            <small class="muted">The recent stransaction total is R {{ formatPrice .BudgetTotal }}</small>
+            <button hx-get="/components/budget/form" hx-trigger="click" hx-target="#addBudget" hx-swap="innerHTML">+</button>
         </h3>
         <section id="addBudget"></section>
         <ul>
@@ -125,4 +127,4 @@
             {{ end }}
         </ul>
     </div>
-</section>
+</section> 

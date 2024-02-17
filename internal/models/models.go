@@ -1,8 +1,10 @@
 package models
 
-type Modeler interface {
-	Save() error
-	Update() error
-	Delete() error
-	FindByID(id int) error
+var RegisteredModels = []interface{}{
+	&User{},
+	&Transaction{},
+	&TransactionType{},
+	&Budget{},
+	&Account{},
+	&BudgetTransaction{},
 }
