@@ -31,6 +31,12 @@ const (
 	BudgetForm                 = "./views/components/budgetform.html"
 )
 
+const (
+	StartDayOfMonth = "+21 days"
+	DateNow         = "now"
+	StringQuery     = "date(transaction_date) >= date(?, 'start of month', '-1 month', ?) AND date(transaction_date) <= date(?, 'start of month', ?)"
+)
+
 func ParseFiles(files ...string) *template.Template {
 	return template.Must(template.ParseFiles(files...))
 }
@@ -99,17 +105,17 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	db := database.ReturnDB()
 	r := ge.Router
 	funcMap := template.FuncMap{
-		"formatDate":  utils.FormatDate,
-		"formatPrice": utils.FormatPrice,
-		"isEmpty":     utils.IsEmpty,
-		"isNil":       utils.IsNil,
+		"formatDate":                    utils.FormatDate,
+		"formatPrice":                   utils.FormatPrice,
+		"isEmpty":                       utils.IsEmpty,
+		"isNil":                         utils.IsNil,
 		"isTotalSpendGreaterThanBudget": utils.IsTotalSpendGreaterThanBudget,
 	}
 	r.SetFuncMap(funcMap)
 	r.LoadHTMLFiles(RecentTransactionComponent)
 
 	var transactions []models.Transaction
-	response := db.Where("date(transaction_date) >= date(?, 'start of month', '-1 month', '+21 days')", "now").Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	response := db.Where(StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
 	if response.Error != nil {
 		r.LoadHTMLFiles(ErrorHTML)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
@@ -118,7 +124,7 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	}
 
 	var budetsItems []models.Budget
-	response = db.Preload("Transactions").Find(&budetsItems)
+	response = db.Preload("Transactions", StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Find(&budetsItems)
 	if response.Error != nil {
 		r.LoadHTMLFiles(ErrorHTML)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
