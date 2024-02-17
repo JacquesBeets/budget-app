@@ -18,10 +18,10 @@ func StringToUint(s string) uint {
 }
 
 func DereferenceUintPtr(ptr *uint) uint {
-    if ptr == nil {
-        return 0 // or any default value you prefer for nil pointers
-    }
-    return *ptr
+	if ptr == nil {
+		return 0 // or any default value you prefer for nil pointers
+	}
+	return *ptr
 }
 
 func IsNil(i interface{}) bool {
@@ -38,7 +38,7 @@ func CheckType(v interface{}) reflect.Type {
 }
 
 func FormatDate(t time.Time) string {
-	return t.Format("2006-01-02") // Change this to your desired format
+	return t.Format("2006-01-02")
 }
 
 func IsEmpty(s string) bool {

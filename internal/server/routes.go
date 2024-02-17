@@ -34,9 +34,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.GET("/health", s.healthHandler)
 
-	// authenticated := r.Group("/")
-	// authenticated.GET("/transactions", controllers.GetTransactions)
-	// authenticated.POST("/transactions", controllers.HandleOFXUpload)
 	return GinEngineVar
 }
 
@@ -46,6 +43,9 @@ func (s *Server) healthHandler(c *gin.Context) {
 
 func HandleViews(r *gin.Engine) {
 	views := controllers.ReturnViewsRouter(r)
+	// authenticated := r.Group("/")
+	// authenticated.GET("/transactions", controllers.GetTransactions)
+	// authenticated.POST("/transactions", controllers.HandleOFXUpload)
 	r.GET("/", views.HomePage)
 
 	r.GET("templates/upload", views.UploadPage)
@@ -55,12 +55,6 @@ func HandleViews(r *gin.Engine) {
 	r.GET("templates/transactions", views.ReturnTransactions)
 	r.GET("templates/transactionstypes", views.ReturnTransactionTypes)
 
-	// Posts
-	r.POST("/upload/ofx", views.HandleOFXUpload)
-	r.POST("/transactionstypes/add", views.HandleTransactionTypeCreate)
-	r.POST("/transactions/:id/transactionstypes/add", views.TransactionsAddTransactionType)
-	r.POST("/transactions/:id/budgetitems/add", views.BudgetTransactionAdd)
-
 }
 
 func HandleComponents(r *gin.Engine) {
@@ -68,5 +62,11 @@ func HandleComponents(r *gin.Engine) {
 
 	r.GET("components/transactions", views.HandleTransctions)
 	r.GET("components/budget/form", views.ReturnBudgetForm)
+
+	// Posts
+	r.POST("/upload/ofx", views.HandleOFXUpload)
 	r.POST("/budget/add", views.SaveBudgetItem)
+	r.POST("/transactionstypes/add", views.HandleTransactionTypeCreate)
+	r.POST("/transactions/:id/transactionstypes/add", views.TransactionsAddTransactionType)
+	r.POST("/transactions/:id/budgetitems/add", views.BudgetTransactionAdd)
 }
