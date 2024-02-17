@@ -2,6 +2,8 @@ package server
 
 import (
 	"budget-app/internal/controllers"
+	"budget-app/internal/utils"
+	"html/template"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +14,16 @@ var GinEngineVar *gin.Engine
 func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
 	GinEngineVar = r
+
+	funcMap := template.FuncMap{
+		"formatDate":                    utils.FormatDate,
+		"formatPrice":                   utils.FormatPrice,
+		"isEmpty":                       utils.IsEmpty,
+		"isNil":                         utils.IsNil,
+		"isTotalSpendGreaterThanBudget": utils.IsTotalSpendGreaterThanBudget,
+		"dereferencePntr":               utils.DereferenceUintPtr,
+	}
+	r.SetFuncMap(funcMap)
 
 	// handle static files
 	r.Static("/static", "./static")

@@ -104,14 +104,6 @@ type BudgetItemWithTotal struct {
 func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	db := database.ReturnDB()
 	r := ge.Router
-	funcMap := template.FuncMap{
-		"formatDate":                    utils.FormatDate,
-		"formatPrice":                   utils.FormatPrice,
-		"isEmpty":                       utils.IsEmpty,
-		"isNil":                         utils.IsNil,
-		"isTotalSpendGreaterThanBudget": utils.IsTotalSpendGreaterThanBudget,
-	}
-	r.SetFuncMap(funcMap)
 	r.LoadHTMLFiles(RecentTransactionComponent)
 
 	var transactions []models.Transaction
@@ -213,15 +205,6 @@ func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
 	r := ge.Router
 	db := database.ReturnDB()
 
-	funcMap := template.FuncMap{
-		"formatDate":      utils.FormatDate,
-		"formatPrice":     utils.FormatPrice,
-		"isEmpty":         utils.IsEmpty,
-		"isNil":           utils.IsNil,
-		"typeOf":          utils.CheckType,
-		"dereferencePntr": utils.DereferenceUintPtr,
-	}
-	r.SetFuncMap(funcMap)
 	r.LoadHTMLFiles(Transactions)
 
 	var transactions []models.Transaction
@@ -270,12 +253,6 @@ func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
 
 func (ge *GinEngine) ReturnTransactionTypes(c *gin.Context) {
 	r := ge.Router
-
-	funcMap := template.FuncMap{
-		"formatDate":  utils.FormatDate,
-		"formatPrice": utils.FormatPrice,
-	}
-	r.SetFuncMap(funcMap)
 	r.LoadHTMLFiles(TransactionTypes)
 
 	db := database.ReturnDB()
@@ -297,29 +274,29 @@ func (ge *GinEngine) ReturnTransactionTypes(c *gin.Context) {
 
 func (ge *GinEngine) HandleTransactionTypeCreate(c *gin.Context) {
 	r := ge.Router
-	funcMap := template.FuncMap{
-		"formatDate":  utils.FormatDate,
-		"formatPrice": utils.FormatPrice,
-	}
-	r.SetFuncMap(funcMap)
 	r.LoadHTMLFiles(TransactionTypes)
 
-	service := database.New()
-	transactionType := models.TransactionType{}
-	transactionType.Title = c.PostForm("title")
-	transactionType.Category = c.PostForm("category")
+	db := database.ReturnDB()
 
-	transactionType, err := CreateTransactionType(service, transactionType)
-	if err != nil {
-		r.LoadHTMLFiles(ErrorHTML)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create transaction type"})
+	category := c.PostForm("category")
+	transactionType := &models.TransactionType{
+		Title:    c.PostForm("title"),
+		Category: &category,
+	}
+
+	response := db.Create(transactionType)
+	if response.Error != nil {
+		fmt.Println("Error saving budget: ", response.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not save budget"})
 		return
 	}
 
-	transactionTypes, err := GetTransactionsTypes(service)
-	if err != nil {
+	var transactionTypes []models.TransactionType
+	response = db.Find(&transactionTypes).Scan(&transactionTypes)
+	if response.Error != nil {
 		r.LoadHTMLFiles(ErrorHTML)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not fetch transaction types"})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
+		fmt.Println("Error getting response: ", response.Error)
 		return
 	}
 
@@ -332,11 +309,6 @@ func (ge *GinEngine) HandleTransactionTypeCreate(c *gin.Context) {
 
 func (ge *GinEngine) TransactionsAddTransactionType(c *gin.Context) {
 	// r := ge.Router
-	// funcMap := template.FuncMap{
-	// 	"formatDate":  utils.FormatDate,
-	// 	"formatPrice": utils.FormatPrice,
-	// }
-	// r.SetFuncMap(funcMap)
 	// r.LoadHTMLFiles(Transactions)
 
 	// service := database.New()
@@ -361,11 +333,6 @@ func (ge *GinEngine) TransactionsAddTransactionType(c *gin.Context) {
 func (ge *GinEngine) BudgetTransactionAdd(c *gin.Context) {
 	r := ge.Router
 	db := database.ReturnDB()
-	// funcMap := template.FuncMap{
-	// 	"formatDate":  utils.FormatDate,
-	// 	"formatPrice": utils.FormatPrice,
-	// }
-	// r.SetFuncMap(funcMap)
 	// r.LoadHTMLFiles(Transactions)
 
 	transactionID := c.Param("id")
