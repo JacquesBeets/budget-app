@@ -22,18 +22,17 @@ var (
 )
 
 func New() *Service {
-	// db, err := sql.Open("sqlite3", dburl)
-	log.Println("New() is being called")
+
 	db, err := gorm.Open(sqlite.Open(dburl), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	s := &Service{db: db}
-	// s.CreateTables()
+
 	ServiceDB = db
 	s.RunMigrations()
-	log.Println("New() completed successfully")
+
 	return s
 }
 
@@ -43,14 +42,6 @@ func ReturnDB() *gorm.DB {
 	}
 	return ServiceDB
 }
-
-// func (s *service) Query(query string, args ...interface{}) (*sql.Rows, error) {
-// 	return s.db.Query(query, args...)
-// }
-
-// func (s *service) Exec(query string, args ...interface{}) (sql.Result, error) {
-// 	return s.db.Exec(query, args...)
-// }
 
 func (s *Service) Health() map[string]string {
 	err := s.db.Exec("SELECT 1").Error
@@ -62,15 +53,6 @@ func (s *Service) Health() map[string]string {
 		"message": "It's healthy",
 	}
 }
-
-// func (s *Service) CreateTables() {
-// 	CreateUserTable(service{db: s.db})
-// 	CreateTransactionTable(service{db: s.db})
-// 	CreateTransactionTypesTable(service{db: s.db})
-// 	CreateBudgetTable(service{db: s.db})
-// 	CreateAccountsTable(service{db: s.db})
-// 	CreateBudgetTransactionsTable(service{db: s.db})
-// }
 
 func (s *Service) RunMigrations() {
 	models := models.RegisteredModels

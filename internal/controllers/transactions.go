@@ -3,6 +3,7 @@ package controllers
 import (
 	"budget-app/internal/database"
 	"budget-app/internal/models"
+	"budget-app/internal/utils"
 	"fmt"
 	"log"
 	"net/http"
@@ -139,59 +140,176 @@ func ParseOFX(filePath, bankName string) error {
 	return nil
 }
 
-// func SaveMultipleTransactions(s database.Service, transactions []models.Transaction) error {
-// 	db := s.GetDBPool()
+type BudgetItemWithTotal struct {
+	Budget                 models.Budget
+	TotalTransactionAmount float64
+}
 
-// 	// Prepare the query for adding transactions
-// 	query := `insert into transactions (
-//         transaction_type,
-//         transaction_date,
-//         transaction_amount,
-//         transaction_id,
-//         transaction_name,
-//         transaction_memo,
-//         created_at,
-//         transaction_type_id,
-//         bank_name
-//     ) values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+func (ge *GinEngine) HandleTransctions(c *gin.Context) {
+	db := database.ReturnDB()
+	r := ge.Router
+	r.LoadHTMLFiles(RecentTransactionComponent)
 
-// 	stmt, err := db.Prepare(query)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer stmt.Close()
+	var transactions []models.Transaction
+	response := db.Joins("Budget").Joins("TransactionType").Where(StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	if response.Error != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
+		fmt.Println("Error getting response: ", response.Error)
+		return
+	}
 
-// 	for _, transaction := range transactions {
+	var budetsItems []models.Budget
+	response = db.Preload("Transactions", StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("amount desc").Find(&budetsItems)
+	if response.Error != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
+		fmt.Println("Error getting response: ", response.Error)
+		return
+	}
 
-// 		// Check if the transaction already exists
-// 		existsQuery := `select count(*) from transactions where transaction_id = ?`
-// 		var count int
-// 		err = db.QueryRow(existsQuery, transaction.TransactionID).Scan(&count)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		if count > 0 {
-// 			// Transaction already exists, do not add it
-// 			log.Println("Transaction already exists")
-// 			continue
-// 		}
+	totalIncome := 0.0
+	totalExpense := 0.0
+	budgetSpent := 0.0
+	recentTotal := 0.0
+	for _, t := range transactions {
+		if t.TransactionTypeID != nil && *t.TransactionTypeID != 12 {
+			if t.TransactionAmount > 0 {
+				fmt.Println(*t.TransactionTypeID, "Adding to totalIncome:", t.TransactionAmount)
+				totalIncome += float64(t.TransactionAmount)
+			} else {
+				fmt.Println(*t.TransactionTypeID, "Adding to totalExpense:", t.TransactionAmount)
+				totalExpense += float64(t.TransactionAmount) // Adjusting for negative expenses
+			}
+		}
+		if t.BudgetID != nil {
+			// fmt.Println("Adding to budgetSpent:", t.TransactionAmount)
+			budgetSpent += float64(t.TransactionAmount)
+		}
+		recentTotal += float64(t.TransactionAmount)
+	}
 
-// 		_, err = stmt.Exec(
-// 			transaction.TransactionType,
-// 			transaction.TransactionDate,
-// 			transaction.TransactionAmount,
-// 			transaction.TransactionID,
-// 			transaction.TransactionName,
-// 			transaction.TransactionMemo,
-// 			transaction.CreatedAt,
-// 			transaction.TransactionTypeID,
-// 			transaction.BankName,
-// 		)
+	budgetTotal := 0.0
 
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
+	budgetTotalItems := []BudgetItemWithTotal{}
 
-// 	return nil
-// }
+	for _, b := range budetsItems {
+		budgetTotal += float64(b.Amount)
+		var totalAmount float64
+		for _, transaction := range b.Transactions {
+			totalAmount += transaction.TransactionAmount
+		}
+		budgetTotalItems = append(budgetTotalItems, BudgetItemWithTotal{
+			Budget:                 b,
+			TotalTransactionAmount: totalAmount,
+		})
+	}
+
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
+	// 	"RecentTotal":      recentTotal,
+	// 	"BudgetTotal":      budgetTotal,
+	// 	"TotalIncome":      totalIncome,
+	// 	"TotalExpense":     totalExpense,
+	// 	"Transactions":     transactions,
+	// 	"TransactionCount": len(transactions),
+	// 	"BudgetItems":      budetsItems,
+	// 	"BudgetSpent":      budgetSpent,
+	// 	"BudgetTotalItems": budgetTotalItems,
+	// })
+
+	c.HTML(http.StatusOK, "recenttransactions.html", gin.H{
+		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
+		"RecentTotal":      recentTotal,
+		"BudgetTotal":      budgetTotal,
+		"TotalIncome":      totalIncome,
+		"TotalExpense":     totalExpense,
+		"Transactions":     transactions,
+		"TransactionCount": len(transactions),
+		"BudgetItems":      budetsItems,
+		"BudgetSpent":      budgetSpent,
+		"BudgetTotalItems": budgetTotalItems,
+	})
+}
+
+type TransactionData struct {
+	Transaction      models.Transaction
+	TransactionTypes []models.TransactionType
+	BudgetItems      []models.Budget
+}
+
+func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
+	r := ge.Router
+	db := database.ReturnDB()
+
+	r.LoadHTMLFiles(Transactions)
+
+	var transactions []models.Transaction
+	response := db.Preload("Budget").Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	if response.Error != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
+		fmt.Println("Error getting response: ", response.Error)
+		return
+	}
+
+	var transactionTypes []models.TransactionType
+	response = db.Find(&transactionTypes).Scan(&transactionTypes)
+	if response.Error != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
+		fmt.Println("Error getting response: ", response.Error)
+		return
+	}
+
+	var budgetItems []models.Budget
+	response = db.Find(&budgetItems).Scan(&budgetItems)
+	if response.Error != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
+		fmt.Println("Error getting response: ", response.Error)
+		return
+	}
+
+	data := []TransactionData{}
+
+	for _, transaction := range transactions {
+		data = append(data, TransactionData{
+			Transaction:      transaction,
+			TransactionTypes: transactionTypes,
+			BudgetItems:      budgetItems,
+		})
+	}
+
+	c.HTML(http.StatusOK, "transactions.html", gin.H{
+		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
+		"TransactionsData": data,
+		"TransactionCount": len(transactions),
+	})
+}
+
+func (ge *GinEngine) TransactionsAddTransactionType(c *gin.Context) {
+	r := ge.Router
+	r.LoadHTMLFiles(Transactions)
+	db := database.ReturnDB()
+
+	transactionID := c.Param("id")
+	transactionTypeID := c.PostForm("transactionTypeID")
+
+	var transaction models.Transaction
+	transaction.ID = utils.StringToUint(transactionID)
+
+	response := db.Model(&transaction).Update("transaction_type_id", transactionTypeID).Scan(&transaction)
+	if response.Error != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "could not add budget item to transaction",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":      "ok",
+		"transaction": transaction,
+	})
+}

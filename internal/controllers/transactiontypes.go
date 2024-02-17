@@ -1,86 +1,67 @@
 package controllers
 
-// import (
-// 	"budget-app/internal/database"
-// 	"budget-app/internal/models"
-// )
+import (
+	"budget-app/internal/database"
+	"budget-app/internal/models"
+	"fmt"
+	"net/http"
+	"time"
 
-// func GetTransactionsTypes(s database.Service) ([]models.TransactionType, error) {
-// 	transactionTypes := []models.TransactionType{}
+	"github.com/gin-gonic/gin"
+)
 
-// 	query := `SELECT * FROM transactions_types;`
+func (ge *GinEngine) ReturnTransactionTypes(c *gin.Context) {
+	r := ge.Router
+	r.LoadHTMLFiles(TransactionTypes)
 
-// 	rows, err := s.Query(query)
-// 	if err != nil {
-// 		return transactionTypes, err
-// 	}
-// 	defer rows.Close()
+	db := database.ReturnDB()
+	var transactionTypes []models.TransactionType
+	response := db.Find(&transactionTypes).Scan(&transactionTypes)
+	if response.Error != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
+		fmt.Println("Error getting response: ", response.Error)
+		return
+	}
 
-// 	for rows.Next() {
-// 		var transactionType models.TransactionType
+	c.HTML(http.StatusOK, "transaction_types.html", gin.H{
+		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
+		"TransactionTypes": transactionTypes,
+		"TransactionCount": len(transactionTypes),
+	})
+}
 
-// 		err := rows.Scan(
-// 			&transactionType.ID,
-// 			&transactionType.Title,
-// 			&transactionType.Category,
-// 			&transactionType.CreatedAt,
-// 		)
-// 		if err != nil {
-// 			return transactionTypes, err
-// 		}
+func (ge *GinEngine) HandleTransactionTypeCreate(c *gin.Context) {
+	r := ge.Router
+	r.LoadHTMLFiles(TransactionTypes)
 
-// 		transactionTypes = append(transactionTypes, transactionType)
-// 	}
+	db := database.ReturnDB()
 
-// 	return transactionTypes, nil
-// }
+	category := c.PostForm("category")
+	transactionType := &models.TransactionType{
+		Title:    c.PostForm("title"),
+		Category: &category,
+	}
 
-// func CreateTransactionType(s database.Service, tnt models.TransactionType) (models.TransactionType, error) {
+	response := db.Create(transactionType)
+	if response.Error != nil {
+		fmt.Println("Error saving budget: ", response.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not save budget"})
+		return
+	}
 
-// 	query := `INSERT INTO transactions_types (title, category) VALUES (?, ?);`
+	var transactionTypes []models.TransactionType
+	response = db.Find(&transactionTypes).Scan(&transactionTypes)
+	if response.Error != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
+		fmt.Println("Error getting response: ", response.Error)
+		return
+	}
 
-// 	result, err := s.Exec(query, tnt.Title, tnt.Category)
-// 	if err != nil {
-// 		return tnt, err
-// 	}
-
-// 	lastId, err := result.LastInsertId()
-// 	if err != nil {
-// 		return tnt, err
-// 	}
-// 	tnt.ID = int(lastId)
-
-// 	return tnt, nil
-// }
-
-// func UpdateTransactionType(s database.Service, trtID int) (models.TransactionType, error) {
-
-// 	transactionType := models.TransactionType{}
-
-// 	query := `UPDATE transactions_types SET title = ?, category = ? WHERE id = ?;`
-
-// 	result, err := s.Exec(query, transactionType.Title, transactionType.Category, trtID)
-// 	if err != nil {
-// 		return transactionType, err
-// 	}
-
-// 	_, err = result.RowsAffected()
-// 	if err != nil {
-// 		return transactionType, err
-// 	}
-
-// 	return transactionType, nil
-// }
-
-// func DeleteTransactionType(s database.Service, trtID int) error {
-
-// 	query := `DELETE FROM transactions_types WHERE id = ?;`
-
-// 	_, err := s.Exec(query, trtID)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-
-// }
+	c.HTML(http.StatusOK, "transaction_types.html", gin.H{
+		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
+		"TransactionTypes": transactionTypes,
+		"TransactionCount": 1,
+	})
+}
