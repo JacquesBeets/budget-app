@@ -1,5 +1,5 @@
 <div class="title">
-    <h1>Transactions</h1>
+    <h1>Transactions <button hx-post="/transactions/duplicate/remove" hx-trigger="click">Remove Duplicates</button></h1>
 </div>
 <div class="tableContainer">
     <div class="border">
@@ -12,47 +12,59 @@
                     <th>Transaction Memo</th>
                     <th>Budget Item</th>
                     <th>Transaction Type</th>
+                    <th>Auto Generated</th>
                 </tr>
             </thead>
             <tbody>
                 {{ range .TransactionsData }}
-                <tr>
-                    {{ $currentTransaction := .Transaction }} <!-- Keep a reference to the current Transaction -->
-                    <td>{{ formatDate .Transaction.TransactionDate }}</td>
-                    <td>{{ .Transaction.BankName }}</td>
-                    <td>R {{ formatPrice .Transaction.TransactionAmount }}</td>
-                    <td>
-                        {{if isEmpty .Transaction.TransactionName}}
-                        {{.Transaction.TransactionMemo}}
-                        {{else}}
-                        {{.Transaction.TransactionName}}
-                        {{end}}
-                    </td>
-                    <td>
-                        <select name="budgetItemID" id="budgetItemSelect"
-                            hx-post="/transactions/{{ .Transaction.ID }}/budgetitems/add" hx-trigger="change">
-                            <option value="" disabled selected>Select</option>
-                            {{ range .BudgetItems }}
-                                {{ if isNil $currentTransaction.BudgetID }}
-                                <option value="{{ .ID }}">{{ .Name }}</option>
-                                {{ else }}
-                                <option value="{{ .ID }}" {{ if eq .ID (dereferencePntr $currentTransaction.BudgetID)
-                                    }}selected{{ end }}>{{ .Name }}</option>
+                    {{if and .Transaction}}
+                    <tr>
+                        {{ $currentTransaction := .Transaction }} <!-- Keep a reference to the current Transaction -->
+                        <td>{{ formatDate .Transaction.TransactionDate }}</td>
+                        <td>{{ .Transaction.BankName }}</td>
+                        <td>R {{ formatPrice .Transaction.TransactionAmount }}</td>
+                        <td>
+                            {{if and .Transaction.TransactionName}}
+                                {{.Transaction.TransactionMemo}}
+                            {{else}}
+                                {{ if and .Transaction.TransactionName}}
+                                    {{.Transaction.TransactionName}}
+                                {{else}}
+                                    NO NAME
+                                {{end}}
+                            {{end}}
+                        </td>
+                        <td>
+                            <select name="budgetItemID" id="budgetItemSelect"
+                                hx-post="/transactions/{{ .Transaction.ID }}/budgetitems/add" hx-trigger="change">
+                                <option value="" disabled selected>Select</option>
+                                {{ range .BudgetItems }}
+                                    {{ if isNil $currentTransaction.BudgetID }}
+                                    <option value="{{ .ID }}">{{ .Name }}</option>
+                                    {{ else }}
+                                    <option value="{{ .ID }}" {{ if eq .ID (dereferencePntr $currentTransaction.BudgetID)
+                                        }}selected{{ end }}>{{ .Name }}</option>
+                                    {{ end }}
                                 {{ end }}
-                            {{ end }}
-                        </select>
-                    </td>
-                    <td>
-                        <select name="transactionTypeID" id="transactionTypeSelect"
-                            hx-post="/transactions/{{ .Transaction.ID }}/transactionstypes/add" hx-trigger="change">
-                            <option value="" disabled selected>Select</option>
-                            {{ range .TransactionTypes }}
-                            <option value="{{ .ID }}" {{ if eq .ID (dereferencePntr $currentTransaction.TransactionTypeID) }}selected{{
-                                end }}>{{ .Title }}</option>
-                            {{ end }}
-                        </select>
-                    </td>
-                </tr>
+                            </select>
+                        </td>
+                        <td>
+                            <select name="transactionTypeID" id="transactionTypeSelect"
+                                hx-post="/transactions/{{ .Transaction.ID }}/transactionstypes/add" hx-trigger="change">
+                                <option value="" disabled selected>Select</option>
+                                {{ range .TransactionTypes }}
+                                <option value="{{ .ID }}" {{ if eq .ID (dereferencePntr $currentTransaction.TransactionTypeID) }}selected{{
+                                    end }}>{{ .Title }}</option>
+                                {{ end }}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="checkbox" name="autoGenerated" id="autoGenerated"
+                                hx-post="/transactions/{{ .Transaction.ID }}/autogenerated" hx-trigger="change"
+                                {{ if .Transaction.AutoCategorized }}checked{{ end }}>
+                        </td>
+                    </tr>
+                    {{ end }}
                 {{ end }}
             </tbody>
         </table>

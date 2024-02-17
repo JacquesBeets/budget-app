@@ -1,10 +1,8 @@
 package controllers
 
 import (
-	"budget-app/internal/database"
 	"budget-app/internal/models"
 	"budget-app/internal/utils"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -12,7 +10,6 @@ import (
 )
 
 func (ge *GinEngine) SaveBudgetItem(c *gin.Context) {
-	dbService := database.ReturnDB()
 	var budget *models.Budget
 
 	name := c.PostForm("name")
@@ -21,8 +18,7 @@ func (ge *GinEngine) SaveBudgetItem(c *gin.Context) {
 	// Convert amount to float64
 	amount, err := strconv.ParseFloat(amountStr, 64)
 	if err != nil {
-		fmt.Println("Error converting amount to float64: ", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid amount"})
+		ge.ReturnErrorJSON(c, err)
 		return
 	}
 
@@ -31,10 +27,9 @@ func (ge *GinEngine) SaveBudgetItem(c *gin.Context) {
 		Amount: amount,
 	}
 
-	response := dbService.Create(budget).Scan(&budget)
+	response := ge.db().Create(budget).Scan(&budget)
 	if response.Error != nil {
-		fmt.Println("Error saving budget: ", response.Error)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not save budget"})
+		ge.ReturnErrorJSON(c, err)
 		return
 	}
 
@@ -42,9 +37,6 @@ func (ge *GinEngine) SaveBudgetItem(c *gin.Context) {
 }
 
 func (ge *GinEngine) BudgetTransactionAdd(c *gin.Context) {
-	r := ge.Router
-	db := database.ReturnDB()
-	// r.LoadHTMLFiles(Transactions)
 
 	transactionID := c.Param("id")
 	budgetID := c.PostForm("budgetItemID")
@@ -52,16 +44,11 @@ func (ge *GinEngine) BudgetTransactionAdd(c *gin.Context) {
 	var transaction models.Transaction
 	transaction.ID = utils.StringToUint(transactionID)
 
-	response := db.Model(&transaction).Update("budget_id", budgetID).Scan(&transaction)
+	response := ge.db().Model(&transaction).Update("budget_id", budgetID).Scan(&transaction)
 	if response.Error != nil {
-		r.LoadHTMLFiles(ErrorHTML)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "could not add budget item to transaction",
-		})
+		ge.ReturnErrorPage(c, response.Error)
 		return
 	}
-
-	fmt.Println("Transaction: ", transaction)
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":      "ok",

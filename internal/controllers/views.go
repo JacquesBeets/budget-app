@@ -37,6 +37,22 @@ type PageData struct {
 	Version string
 }
 
+func (ge *GinEngine) ReturnErrorPage(c *gin.Context, err error) {
+	r := ge.Router
+	fmt.Printf("Error: %v", err)
+	r.LoadHTMLFiles(ErrorHTML)
+	c.HTML(http.StatusOK, "error.html", gin.H{
+		"error": err,
+	})
+}
+
+func (ge *GinEngine) ReturnErrorJSON(c *gin.Context, err error) {
+	fmt.Printf("Error: %v", err)
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"error": err,
+	})
+}
+
 func (ge *GinEngine) HomePage(c *gin.Context) {
 
 	r := ge.Router
@@ -82,4 +98,35 @@ func (ge *GinEngine) UploadPageRefreshed(c *gin.Context) {
 	c.HTML(http.StatusOK, "homepage/index.html", gin.H{
 		"Version": fmt.Sprintf("%d", version),
 	})
+}
+
+type UniqueFields struct {
+	ID                uint
+	TransactionDate   time.Time
+	TransactionAmount float64
+	TransactionName   string
+	TransactionMemo   string
+}
+
+func (ge *GinEngine) RemoveDuplicateTransactions(c *gin.Context) {
+	// r := ge.Router
+	db := ge.db()
+
+	var uniqueTransactions []UniqueFields
+	var transactionIDs []uint
+
+	// Step 1 and 2: Group by unique fields and get the IDs
+	db.Table("transactions").Select("transaction_memo, transaction_name, transaction_date, transaction_amount, MIN(id) as id").Group("transaction_memo, transaction_name, transaction_date, transaction_amount").Scan(&uniqueTransactions)
+
+	// Step 3: Extract the IDs
+	for _, transaction := range uniqueTransactions {
+		transactionIDs = append(transactionIDs, transaction.ID)
+	}
+
+	fmt.Println("Transaction IDs: ", transactionIDs)
+	c.JSON(http.StatusOK, gin.H{
+		"OK": http.StatusOK,
+	})
+	// Step 4: Delete all records that are not in the list of IDs
+	// db.Where("id NOT IN ?", transactionIDs).Delete(&models.Transaction{})
 }

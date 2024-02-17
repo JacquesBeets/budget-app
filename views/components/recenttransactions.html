@@ -104,8 +104,9 @@
                         {{end}}
                     </h5>
                 </span>
-                <span class="">
+                <span class="alignRight">
                     R {{ formatPrice .TransactionAmount }}
+                    <small class="muted">{{ formatDate .TransactionDate}}</small>
                 </span>
             </li>
             {{ end }}

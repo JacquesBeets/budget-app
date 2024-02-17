@@ -15,32 +15,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewTransaction(
-	transactionType string,
-	transactionDate string,
-	transactionAmount float64,
-	transactionID string,
-	transactionName string,
-	transactionMemo string,
-	bankName string,
-) (*models.Transaction, error) {
-
-	transactionDateParsed, err := time.Parse("2006-01-02", transactionDate)
-	if err != nil {
-		return nil, err
-	}
-
-	return &models.Transaction{
-		BankTransactionType: &transactionType,
-		TransactionDate:     transactionDateParsed,
-		TransactionAmount:   transactionAmount,
-		BankTransactionID:   transactionID,
-		TransactionName:     &transactionName,
-		TransactionMemo:     &transactionMemo,
-		BankName:            bankName,
-	}, nil
-}
-
 func (ge *GinEngine) HandleOFXUpload(c *gin.Context) {
 	// single file
 	r := ge.Router
@@ -56,7 +30,6 @@ func (ge *GinEngine) HandleOFXUpload(c *gin.Context) {
 	err := ParseOFX(dst, bank)
 	if err != nil {
 		fmt.Printf("could not parse OFX file: %v", err)
-		// c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not parse OFX file"})
 		return
 	}
 
@@ -81,7 +54,7 @@ func ParseOFX(filePath, bankName string) error {
 		return err
 	}
 
-	var Transactions []models.Transaction
+	var Transactions models.Transactions
 
 	// Access the Bank Messages
 	if len(resp.Bank) > 0 {
@@ -95,7 +68,9 @@ func ParseOFX(filePath, bankName string) error {
 				amount, _ := transaction.TrnAmt.Float64()
 				trnAmt := float64(amount)
 
-				trn, err := NewTransaction(
+				var transactionModel models.Transaction
+
+				trn, err := transactionModel.New(
 					fmt.Sprint(transaction.TrnType),
 					transaction.DtPosted.Format("2006-01-02"),
 					trnAmt,
@@ -109,14 +84,12 @@ func ParseOFX(filePath, bankName string) error {
 					return err
 				}
 
-				// Check if the transaction already exists
-				var transactionModel models.Transaction
-				if err := db.Where("bank_transaction_id = ?", trn.BankTransactionID).First(&transactionModel).Error; err != nil {
-					if err == gorm.ErrRecordNotFound {
+				// Check if transaction already exists
+				response := trn.Exists(db)
+				if response.Error != nil {
+					if response.Error == gorm.ErrRecordNotFound {
+						trn.AutoCategorize(db)
 						Transactions = append(Transactions, *trn)
-					} else {
-						// Some other error occurred
-						return err
 					}
 				} else {
 					// Transaction already exists, do not add it
@@ -125,15 +98,15 @@ func ParseOFX(filePath, bankName string) error {
 				}
 
 			}
+			Transactions.PrintAll()
+			// if len(Transactions) > 0 {
+			// 	createdTransactions := Transactions.Create(db)
 
-			if len(Transactions) > 0 {
-				createdTransactions := db.Create(Transactions)
-
-				if createdTransactions.Error != nil {
-					fmt.Printf("could not create transactions: %v", createdTransactions.Error)
-					return createdTransactions.Error
-				}
-			}
+			// 	if createdTransactions.Error != nil {
+			// 		fmt.Printf("could not create transactions: %v", createdTransactions.Error)
+			// 		return createdTransactions.Error
+			// 	}
+			// }
 		}
 	}
 
@@ -146,12 +119,11 @@ type BudgetItemWithTotal struct {
 }
 
 func (ge *GinEngine) HandleTransctions(c *gin.Context) {
-	db := database.ReturnDB()
 	r := ge.Router
 	r.LoadHTMLFiles(RecentTransactionComponent)
 
 	var transactions []models.Transaction
-	response := db.Joins("Budget").Joins("TransactionType").Where(StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	response := ge.db().Joins("Budget").Joins("TransactionType").Where(StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
 	if response.Error != nil {
 		r.LoadHTMLFiles(ErrorHTML)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
@@ -160,7 +132,7 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	}
 
 	var budetsItems []models.Budget
-	response = db.Preload("Transactions", StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("amount desc").Find(&budetsItems)
+	response = ge.db().Preload("Transactions", StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("amount desc").Find(&budetsItems)
 	if response.Error != nil {
 		r.LoadHTMLFiles(ErrorHTML)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
@@ -175,10 +147,10 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	for _, t := range transactions {
 		if t.TransactionTypeID != nil && *t.TransactionTypeID != 12 {
 			if t.TransactionAmount > 0 {
-				fmt.Println(*t.TransactionTypeID, "Adding to totalIncome:", t.TransactionAmount)
+				// fmt.Println(*t.TransactionTypeID, "Adding to totalIncome:", t.TransactionAmount)
 				totalIncome += float64(t.TransactionAmount)
 			} else {
-				fmt.Println(*t.TransactionTypeID, "Adding to totalExpense:", t.TransactionAmount)
+				// fmt.Println(*t.TransactionTypeID, "Adding to totalExpense:", t.TransactionAmount)
 				totalExpense += float64(t.TransactionAmount) // Adjusting for negative expenses
 			}
 		}
@@ -240,34 +212,26 @@ type TransactionData struct {
 
 func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
 	r := ge.Router
-	db := database.ReturnDB()
-
 	r.LoadHTMLFiles(Transactions)
 
 	var transactions []models.Transaction
-	response := db.Preload("Budget").Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	response := ge.db().Preload("Budget").Order("transaction_date desc").Find(&transactions).Scan(&transactions)
 	if response.Error != nil {
-		r.LoadHTMLFiles(ErrorHTML)
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
-		fmt.Println("Error getting response: ", response.Error)
+		ge.ReturnErrorPage(c, response.Error)
 		return
 	}
 
 	var transactionTypes []models.TransactionType
-	response = db.Find(&transactionTypes).Scan(&transactionTypes)
+	response = ge.db().Find(&transactionTypes).Scan(&transactionTypes)
 	if response.Error != nil {
-		r.LoadHTMLFiles(ErrorHTML)
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
-		fmt.Println("Error getting response: ", response.Error)
+		ge.ReturnErrorPage(c, response.Error)
 		return
 	}
 
 	var budgetItems []models.Budget
-	response = db.Find(&budgetItems).Scan(&budgetItems)
+	response = ge.db().Find(&budgetItems).Scan(&budgetItems)
 	if response.Error != nil {
-		r.LoadHTMLFiles(ErrorHTML)
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
-		fmt.Println("Error getting response: ", response.Error)
+		ge.ReturnErrorPage(c, response.Error)
 		return
 	}
 
@@ -291,20 +255,19 @@ func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
 func (ge *GinEngine) TransactionsAddTransactionType(c *gin.Context) {
 	r := ge.Router
 	r.LoadHTMLFiles(Transactions)
-	db := database.ReturnDB()
-
-	transactionID := c.Param("id")
-	transactionTypeID := c.PostForm("transactionTypeID")
 
 	var transaction models.Transaction
-	transaction.ID = utils.StringToUint(transactionID)
 
-	response := db.Model(&transaction).Update("transaction_type_id", transactionTypeID).Scan(&transaction)
+	transactionIDUint := utils.StringToUint(c.Param("id"))
+	transactionTypeIDUint := utils.StringToUint(c.PostForm("transactionTypeID"))
+
+	transaction.ID = transactionIDUint
+	transaction.TransactionTypeID = &transactionTypeIDUint
+
+	response := transaction.Update(ge.db())
+	// response := db.Model(&transaction).Update("transaction_type_id", transactionTypeID).Scan(&transaction)
 	if response.Error != nil {
-		r.LoadHTMLFiles(ErrorHTML)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "could not add budget item to transaction",
-		})
+		ge.ReturnErrorPage(c, response.Error)
 		return
 	}
 

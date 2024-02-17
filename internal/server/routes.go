@@ -69,4 +69,5 @@ func HandleComponents(r *gin.Engine) {
 	r.POST("/transactionstypes/add", views.HandleTransactionTypeCreate)
 	r.POST("/transactions/:id/transactionstypes/add", views.TransactionsAddTransactionType)
 	r.POST("/transactions/:id/budgetitems/add", views.BudgetTransactionAdd)
+	r.POST("/transactions/duplicate/remove", views.RemoveDuplicateTransactions)
 }

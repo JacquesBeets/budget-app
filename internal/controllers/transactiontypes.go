@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"budget-app/internal/database"
 	"budget-app/internal/models"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -13,14 +11,10 @@ import (
 func (ge *GinEngine) ReturnTransactionTypes(c *gin.Context) {
 	r := ge.Router
 	r.LoadHTMLFiles(TransactionTypes)
-
-	db := database.ReturnDB()
 	var transactionTypes []models.TransactionType
-	response := db.Find(&transactionTypes).Scan(&transactionTypes)
+	response := ge.db().Find(&transactionTypes).Scan(&transactionTypes)
 	if response.Error != nil {
-		r.LoadHTMLFiles(ErrorHTML)
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
-		fmt.Println("Error getting response: ", response.Error)
+		ge.ReturnErrorPage(c, response.Error)
 		return
 	}
 
@@ -35,27 +29,22 @@ func (ge *GinEngine) HandleTransactionTypeCreate(c *gin.Context) {
 	r := ge.Router
 	r.LoadHTMLFiles(TransactionTypes)
 
-	db := database.ReturnDB()
-
 	category := c.PostForm("category")
 	transactionType := &models.TransactionType{
 		Title:    c.PostForm("title"),
 		Category: &category,
 	}
 
-	response := db.Create(transactionType)
+	response := ge.db().Create(transactionType)
 	if response.Error != nil {
-		fmt.Println("Error saving budget: ", response.Error)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not save budget"})
+		ge.ReturnErrorPage(c, response.Error)
 		return
 	}
 
 	var transactionTypes []models.TransactionType
-	response = db.Find(&transactionTypes).Scan(&transactionTypes)
+	response = ge.db().Find(&transactionTypes).Scan(&transactionTypes)
 	if response.Error != nil {
-		r.LoadHTMLFiles(ErrorHTML)
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
-		fmt.Println("Error getting response: ", response.Error)
+		ge.ReturnErrorPage(c, response.Error)
 		return
 	}
 
