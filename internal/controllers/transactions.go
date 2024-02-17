@@ -4,12 +4,14 @@ import (
 	"budget-app/internal/database"
 	"budget-app/internal/models"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/aclindsa/ofxgo"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func NewTransaction(
@@ -35,105 +37,8 @@ func NewTransaction(
 		TransactionName:     &transactionName,
 		TransactionMemo:     &transactionMemo,
 		BankName:            bankName,
-		CreatedAt:           time.Now().UTC(),
 	}, nil
 }
-
-// func GetAllTransactions(s database.Service) ([]models.Transaction, error) {
-// 	transactions := []models.Transaction{}
-
-// 	query := `SELECT * FROM transactions ORDER BY date(transaction_date) DESC;`
-
-// 	rows, err := s.Query(query)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return transactions, err
-// 	}
-// 	defer rows.Close()
-
-// 	for rows.Next() {
-// 		var transaction models.Transaction
-// 		var transactionDateString string
-
-// 		err := rows.Scan(
-// 			&transaction.ID,
-// 			&transaction.TransactionType,
-// 			&transactionDateString,
-// 			&transaction.TransactionAmount,
-// 			&transaction.TransactionID,
-// 			&transaction.TransactionName,
-// 			&transaction.TransactionMemo,
-// 			&transaction.CreatedAt,
-// 			&transaction.BankName,
-// 			&transaction.TransactionTypeID,
-// 			&transaction.BudgetItemID,
-// 		)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			return transactions, err
-// 		}
-
-// 		// Parse the date string into a time.Time type
-// 		transaction.TransactionDate, err = time.Parse("2006-01-02 15:04:05-07:00", transactionDateString)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			return transactions, err
-// 		}
-// 		transactions = append(transactions, transaction)
-// 	}
-
-// 	return transactions, nil
-// }
-
-// func GetTransactions(s database.Service) ([]models.Transaction, error) {
-// 	transactions := []models.Transaction{}
-// 	currentMonth := time.Now().Format("01") // "01" is the format for two-digit month in Go
-
-	// query := `SELECT *
-	// FROM transactions
-	// WHERE date(transaction_date) >= date('now', 'start of month', '-1 month', '+23 days')
-	// ORDER BY date(transaction_date) DESC;`
-
-// 	rows, err := s.Query(query, currentMonth)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return transactions, err
-// 	}
-// 	defer rows.Close()
-
-// 	for rows.Next() {
-// 		var transaction models.Transaction
-// 		var transactionDateString string
-
-// 		err := rows.Scan(
-// 			&transaction.ID,
-// 			&transaction.TransactionType,
-// 			&transactionDateString,
-// 			&transaction.TransactionAmount,
-// 			&transaction.TransactionID,
-// 			&transaction.TransactionName,
-// 			&transaction.TransactionMemo,
-// 			&transaction.CreatedAt,
-// 			&transaction.BankName,
-// 			&transaction.TransactionTypeID,
-// 			&transaction.BudgetItemID,
-// 		)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			return transactions, err
-// 		}
-
-// 		// Parse the date string into a time.Time type
-// 		transaction.TransactionDate, err = time.Parse("2006-01-02 15:04:05-07:00", transactionDateString)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			return transactions, err
-// 		}
-// 		transactions = append(transactions, transaction)
-// 	}
-
-// 	return transactions, nil
-// }
 
 func (ge *GinEngine) HandleOFXUpload(c *gin.Context) {
 	// single file
@@ -160,7 +65,7 @@ func (ge *GinEngine) HandleOFXUpload(c *gin.Context) {
 }
 
 func ParseOFX(filePath, bankName string) error {
-	dbService := database.ReturnDB()
+	db := database.ReturnDB()
 
 	f, err := os.Open(filePath)
 	if err != nil {
@@ -185,7 +90,7 @@ func ParseOFX(filePath, bankName string) error {
 			transactions := stmt.BankTranList
 			for _, transaction := range transactions.Transactions {
 
-				// Add Transaction
+				// Create Transaction
 				amount, _ := transaction.TrnAmt.Float64()
 				trnAmt := float64(amount)
 
@@ -202,14 +107,31 @@ func ParseOFX(filePath, bankName string) error {
 					fmt.Printf("could not create transaction: %v", err)
 					return err
 				}
-				Transactions = append(Transactions, *trn)
+
+				// Check if the transaction already exists
+				var transactionModel models.Transaction
+				if err := db.Where("bank_transaction_id = ?", trn.BankTransactionID).First(&transactionModel).Error; err != nil {
+					if err == gorm.ErrRecordNotFound {
+						Transactions = append(Transactions, *trn)
+					} else {
+						// Some other error occurred
+						return err
+					}
+				} else {
+					// Transaction already exists, do not add it
+					log.Println("Transaction already exists")
+					continue
+				}
+
 			}
 
-			createdTransactions := dbService.Create(Transactions)
+			if len(Transactions) > 0 {
+				createdTransactions := db.Create(Transactions)
 
-			if createdTransactions.Error != nil {
-				fmt.Printf("could not create transactions: %v", createdTransactions.Error)
-				return createdTransactions.Error
+				if createdTransactions.Error != nil {
+					fmt.Printf("could not create transactions: %v", createdTransactions.Error)
+					return createdTransactions.Error
+				}
 			}
 		}
 	}
@@ -269,29 +191,6 @@ func ParseOFX(filePath, bankName string) error {
 // 		if err != nil {
 // 			return err
 // 		}
-// 	}
-
-// 	return nil
-// }
-
-// func LinkTransactionType(s database.Service, transactionID string, transactionTypeID string) error {
-// 	query := `UPDATE transactions SET transaction_type_id = ? WHERE id = ?;`
-
-// 	_, err := s.Exec(query, transactionTypeID, transactionID)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-
-// }
-
-// func LinkBudgetToTransaction(s database.Service, transactionID string, budgetID string) error {
-// 	query := `UPDATE transactions SET budget_item_id = ? WHERE id = ?;`
-
-// 	_, err := s.Exec(query, budgetID, transactionID)
-// 	if err != nil {
-// 		return err
 // 	}
 
 // 	return nil

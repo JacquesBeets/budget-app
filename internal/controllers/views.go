@@ -107,7 +107,10 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	r.LoadHTMLFiles(RecentTransactionComponent)
 
 	var transactions []models.Transaction
-	response := db.Where(StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	// response := db.Joins("Budget").Find(&transactions).Scan(&transactions)
+	// response := db.Where(StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	response := db.Joins("Budget").Joins("TransactionType").Where(StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	// response := db.Model(&transactions).Where(StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("transaction_date desc").Association("Budget").DB.Scan(&transactions)
 	if response.Error != nil {
 		r.LoadHTMLFiles(ErrorHTML)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
@@ -124,23 +127,17 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 		return
 	}
 
-	// Print budget items along with their transactions
-	// for _, b := range budetsItems {
-	// 	fmt.Printf("Budget: %s (Amount: %f)\n", b.Name, b.Amount)
-	// 	for _, t := range b.Transactions {
-	// 		fmt.Printf("Transaction: Type: %s, Amount: %f\n", t.BankTransactionType, t.TransactionAmount)
-	// 	}
-	// }
-
 	totalIncome := 0.0
 	totalExpense := 0.0
 	budgetSpent := 0.0
 	for _, t := range transactions {
 		// if value is positive, it is income
-		if t.TransactionAmount > 0 {
-			totalIncome += float64(t.TransactionAmount)
-		} else {
-			totalExpense += float64(t.TransactionAmount)
+		if t.TransactionTypeID != nil {
+			if t.TransactionAmount > 0 {
+				totalIncome += float64(t.TransactionAmount)
+			} else {
+				totalExpense += float64(t.TransactionAmount)
+			}
 		}
 		if t.BudgetID != nil {
 			budgetSpent += float64(t.TransactionAmount)

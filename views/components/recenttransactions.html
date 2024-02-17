@@ -97,7 +97,11 @@
                         {{else}}
                             {{.TransactionMemo}}
                         {{end}}
-                        <small class="muted">{{ .BankName }} &bullet; {{formatDate .TransactionDate}}</small>
+                        {{if and .TransactionType .Budget}}
+                        <small class="muted">{{if and .TransactionType}}{{ .TransactionType.Title }}{{end}} {{if and .Budget}}&bullet; {{ .Budget.Name }} {{end}}</small>
+                        {{else}}
+                        <small class="muted">{{if and .TransactionType}}{{ .TransactionType.Title }}{{end}} {{if and .Budget }}{{ .Budget.Name }} {{end}}</small>
+                        {{end}}
                     </h5>
                 </span>
                 <span class="">
