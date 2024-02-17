@@ -90,6 +90,11 @@ func (ge *GinEngine) UploadPageRefreshed(c *gin.Context) {
 	})
 }
 
+type BudgetItemWithTotal struct {
+	Budget                 models.Budget
+	TotalTransactionAmount float64
+}
+
 func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	db := database.ReturnDB()
 	r := ge.Router
@@ -98,6 +103,7 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 		"formatPrice": utils.FormatPrice,
 		"isEmpty":     utils.IsEmpty,
 		"isNil":       utils.IsNil,
+		"isTotalSpendGreaterThanBudget": utils.IsTotalSpendGreaterThanBudget,
 	}
 	r.SetFuncMap(funcMap)
 	r.LoadHTMLFiles(RecentTransactionComponent)
@@ -150,9 +156,32 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 
 	budgetTotal := 0.0
 
+	budgetTotalItems := []BudgetItemWithTotal{}
+
 	for _, b := range budetsItems {
 		budgetTotal += float64(b.Amount)
+		var totalAmount float64
+		for _, transaction := range b.Transactions {
+			totalAmount += transaction.TransactionAmount
+		}
+		budgetTotalItems = append(budgetTotalItems, BudgetItemWithTotal{
+			Budget:                 b,
+			TotalTransactionAmount: totalAmount,
+		})
 	}
+
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
+	// 	"RecentTotal":      recentTotal,
+	// 	"BudgetTotal":      budgetTotal,
+	// 	"TotalIncome":      totalIncome,
+	// 	"TotalExpense":     totalExpense,
+	// 	"Transactions":     transactions,
+	// 	"TransactionCount": len(transactions),
+	// 	"BudgetItems":      budetsItems,
+	// 	"BudgetSpent":      budgetSpent,
+	// 	"BudgetTotalItems": budgetTotalItems,
+	// })
 
 	c.HTML(http.StatusOK, "recenttransactions.html", gin.H{
 		"now":              time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
@@ -164,6 +193,7 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 		"TransactionCount": len(transactions),
 		"BudgetItems":      budetsItems,
 		"BudgetSpent":      budgetSpent,
+		"BudgetTotalItems": budgetTotalItems,
 	})
 }
 
