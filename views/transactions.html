@@ -47,7 +47,7 @@
                             hx-post="/transactions/{{ .Transaction.ID }}/transactionstypes/add" hx-trigger="change">
                             <option value="" disabled selected>Select</option>
                             {{ range .TransactionTypes }}
-                            <option value="{{ .ID }}" {{ if eq .ID $currentTransaction.TransactionTypeID }}selected{{
+                            <option value="{{ .ID }}" {{ if eq .ID (dereferencePntr $currentTransaction.TransactionTypeID) }}selected{{
                                 end }}>{{ .Title }}</option>
                             {{ end }}
                         </select>

@@ -308,26 +308,29 @@ func (ge *GinEngine) HandleTransactionTypeCreate(c *gin.Context) {
 }
 
 func (ge *GinEngine) TransactionsAddTransactionType(c *gin.Context) {
-	// r := ge.Router
-	// r.LoadHTMLFiles(Transactions)
+	r := ge.Router
+	r.LoadHTMLFiles(Transactions)
+	db := database.ReturnDB()
 
-	// service := database.New()
-	// transactionID := c.Param("id")
-	// transactionTypeID := c.PostForm("transactionTypeID")
+	transactionID := c.Param("id")
+	transactionTypeID := c.PostForm("transactionTypeID")
 
-	// err := LinkTransactionType(service, transactionID, transactionTypeID)
+	var transaction models.Transaction
+	transaction.ID = utils.StringToUint(transactionID)
 
-	// if err != nil {
-	// 	r.LoadHTMLFiles(ErrorHTML)
-	// 	c.JSON(http.StatusInternalServerError, gin.H{
-	// 		"error": "could not add transaction type to transaction",
-	// 	})
-	// 	return
-	// }
+	response := db.Model(&transaction).Update("transaction_type_id", transactionTypeID).Scan(&transaction)
+	if response.Error != nil {
+		r.LoadHTMLFiles(ErrorHTML)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "could not add budget item to transaction",
+		})
+		return
+	}
 
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"status": "ok",
-	// })
+	c.JSON(http.StatusOK, gin.H{
+		"status":      "ok",
+		"transaction": transaction,
+	})
 }
 
 func (ge *GinEngine) BudgetTransactionAdd(c *gin.Context) {
