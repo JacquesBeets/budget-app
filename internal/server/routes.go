@@ -54,7 +54,7 @@ func HandleViews(r *gin.Engine) {
 	r.GET("templates/dashboard", views.Dashboard)
 	r.GET("templates/transactions", views.ReturnTransactions)
 	r.GET("templates/transactionstypes", views.ReturnTransactionTypes)
-
+	r.GET("templates/crypto", views.ReturnCryptoView)
 }
 
 func HandleComponents(r *gin.Engine) {
@@ -70,4 +70,5 @@ func HandleComponents(r *gin.Engine) {
 	r.POST("/transactions/:id/transactionstypes/add", views.TransactionsAddTransactionType)
 	r.POST("/transactions/:id/budgetitems/add", views.BudgetTransactionAdd)
 	r.POST("/transactions/duplicate/remove", views.RemoveDuplicateTransactions)
+	r.POST("/crypto/add", views.SaveCryptoCoin)
 }

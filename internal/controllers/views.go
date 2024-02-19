@@ -19,6 +19,7 @@ const (
 	ErrorHTML        = "./views/error.html"
 	Transactions     = "./views/transactions.html"
 	TransactionTypes = "./views/transaction_types.html"
+	Crypto           = "./views/crypto_portfolio.html"
 )
 
 // Components

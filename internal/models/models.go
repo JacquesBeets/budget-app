@@ -7,4 +7,5 @@ var RegisteredModels = []interface{}{
 	&Budget{},
 	&Account{},
 	&BudgetTransaction{},
+	&CryptoCoin{},
 }
