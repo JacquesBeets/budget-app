@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -51,12 +52,24 @@ func (t *Transaction) New(
 	}, nil
 }
 
-func (t *Transaction) Exists(tx *gorm.DB) *gorm.DB {
+func (t *Transaction) Exists(tx *gorm.DB) bool {
+	var similarTransaction Transaction
+	var response *gorm.DB
+
 	if t.BankName == "FNB" {
-		return tx.Where("date(transaction_date) = ? AND transaction_amount = ? AND transaction_memo = ?", &t.TransactionDate, &t.TransactionAmount, &t.TransactionMemo)
+		response = tx.Where("date(transaction_date) = date(?) AND transaction_amount = ? AND transaction_memo = ?", &t.TransactionDate, &t.TransactionAmount, &t.TransactionMemo).First(&similarTransaction)
 	} else {
-		return tx.Where("date(transaction_date) = ? AND transaction_amount = ? AND transaction_name = ?", &t.TransactionDate, &t.TransactionAmount, &t.TransactionName)
+		response = tx.Where("date(transaction_date) = date(?) AND transaction_amount = ? AND transaction_name = ?", &t.TransactionDate, &t.TransactionAmount, &t.TransactionName).First(&similarTransaction)
 	}
+
+	if response.Error != nil {
+		if errors.Is(response.Error, gorm.ErrRecordNotFound) {
+			return false
+		}
+		return false
+	}
+
+	return true
 }
 
 func (t *Transaction) AutoCategorize(tx *gorm.DB) {
@@ -102,6 +115,10 @@ func (t *Transaction) Create(tx *gorm.DB) *gorm.DB {
 
 func (t *Transaction) Update(tx *gorm.DB) *gorm.DB {
 	return tx.Save(&t).Scan(&t)
+}
+
+func (t *Transaction) FindByID(tx *gorm.DB, id uint) *gorm.DB {
+	return tx.First(&t, &t.ID).Scan(&t)
 }
 
 func (t *Transactions) PrintAll() {

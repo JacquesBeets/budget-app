@@ -24,14 +24,10 @@
                         <td>{{ .Transaction.BankName }}</td>
                         <td>R {{ formatPrice .Transaction.TransactionAmount }}</td>
                         <td>
-                            {{if and .Transaction.TransactionName}}
+                            {{if isEmpty .Transaction.TransactionName}}
                                 {{.Transaction.TransactionMemo}}
                             {{else}}
-                                {{ if and .Transaction.TransactionName}}
-                                    {{.Transaction.TransactionName}}
-                                {{else}}
-                                    NO NAME
-                                {{end}}
+                                {{.Transaction.TransactionName}}
                             {{end}}
                         </td>
                         <td>
@@ -42,8 +38,7 @@
                                     {{ if isNil $currentTransaction.BudgetID }}
                                     <option value="{{ .ID }}">{{ .Name }}</option>
                                     {{ else }}
-                                    <option value="{{ .ID }}" {{ if eq .ID (dereferencePntr $currentTransaction.BudgetID)
-                                        }}selected{{ end }}>{{ .Name }}</option>
+                                    <option value="{{ .ID }}" {{ if eq .ID (dereferencePntr $currentTransaction.BudgetID)}}selected{{ end }}>{{ .Name }}</option>
                                     {{ end }}
                                 {{ end }}
                             </select>

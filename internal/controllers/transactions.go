@@ -12,7 +12,6 @@ import (
 
 	"github.com/aclindsa/ofxgo"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 func (ge *GinEngine) HandleOFXUpload(c *gin.Context) {
@@ -86,27 +85,24 @@ func ParseOFX(filePath, bankName string) error {
 
 				// Check if transaction already exists
 				response := trn.Exists(db)
-				if response.Error != nil {
-					if response.Error == gorm.ErrRecordNotFound {
-						trn.AutoCategorize(db)
-						Transactions = append(Transactions, *trn)
-					}
+				if !response {
+					trn.AutoCategorize(db)
+					Transactions = append(Transactions, *trn)
 				} else {
-					// Transaction already exists, do not add it
 					log.Println("Transaction already exists")
 					continue
 				}
 
 			}
-			Transactions.PrintAll()
-			// if len(Transactions) > 0 {
-			// 	createdTransactions := Transactions.Create(db)
 
-			// 	if createdTransactions.Error != nil {
-			// 		fmt.Printf("could not create transactions: %v", createdTransactions.Error)
-			// 		return createdTransactions.Error
-			// 	}
-			// }
+			if len(Transactions) > 0 {
+				createdTransactions := Transactions.Create(db)
+				// Transactions.PrintAll()
+				if createdTransactions.Error != nil {
+					fmt.Printf("could not create transactions: %v", createdTransactions.Error)
+					return createdTransactions.Error
+				}
+			}
 		}
 	}
 
@@ -264,8 +260,7 @@ func (ge *GinEngine) TransactionsAddTransactionType(c *gin.Context) {
 	transaction.ID = transactionIDUint
 	transaction.TransactionTypeID = &transactionTypeIDUint
 
-	response := transaction.Update(ge.db())
-	// response := db.Model(&transaction).Update("transaction_type_id", transactionTypeID).Scan(&transaction)
+	response := ge.db().Model(&transaction).Update("transaction_type_id", &transactionTypeIDUint).Scan(&transaction)
 	if response.Error != nil {
 		ge.ReturnErrorPage(c, response.Error)
 		return

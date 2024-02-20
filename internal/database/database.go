@@ -55,6 +55,10 @@ func (s *Service) Health() map[string]string {
 }
 
 func (s *Service) RunMigrations() {
+	// err := s.db.Migrator().DropTable(&models.Transactions{})
+	// if err != nil {
+	// 	log.Println(err)
+	// }
 	models := models.RegisteredModels
 	s.db.AutoMigrate(models...)
 }

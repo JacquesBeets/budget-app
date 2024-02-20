@@ -39,12 +39,12 @@ func (ge *GinEngine) SaveBudgetItem(c *gin.Context) {
 func (ge *GinEngine) BudgetTransactionAdd(c *gin.Context) {
 
 	transactionID := c.Param("id")
-	budgetID := c.PostForm("budgetItemID")
+	budgetID := utils.StringToUint(c.PostForm("budgetItemID"))
 
 	var transaction models.Transaction
 	transaction.ID = utils.StringToUint(transactionID)
 
-	response := ge.db().Model(&transaction).Update("budget_id", budgetID).Scan(&transaction)
+	response := ge.db().Model(&transaction).Update("budget_id", &budgetID).Scan(&transaction)
 	if response.Error != nil {
 		ge.ReturnErrorPage(c, response.Error)
 		return
