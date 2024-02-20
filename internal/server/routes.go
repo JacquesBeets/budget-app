@@ -62,6 +62,7 @@ func HandleComponents(r *gin.Engine) {
 
 	r.GET("components/transactions", views.HandleTransctions)
 	r.GET("components/budget/form", views.ReturnBudgetForm)
+	r.GET("/crypto/fetch/prices", views.FetchCurrentCrypoPrices)
 
 	// Posts
 	r.POST("/upload/ofx", views.HandleOFXUpload)
