@@ -4,7 +4,7 @@
     <div class="recentTransactions border">
         <h3>
             Crypto We Own
-            <small class="muted">The recent stransaction total is...</small>
+            <small class="muted">R {{ formatPrice .TotalValue }}</small>
             <button class="updatePrices"  hx-get="/crypto/fetch/prices" hx-target="#content" hx-swap="innerHTML">Fetch New Prices</button>
         </h3>
         <ul >

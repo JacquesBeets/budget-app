@@ -238,8 +238,7 @@ button {
     padding: .5rem;
 }
 
-.tableContainer{
-    overflow: hidden;
+.tableContainer .scroll {
     overflow-y: auto;
     max-height: 750px;
 }
@@ -248,6 +247,9 @@ thead {
     position: sticky;
     top: -17px;
     background-color: #000;
+}
+
+thead th{
     border-bottom: 3px solid #333;
 }
 

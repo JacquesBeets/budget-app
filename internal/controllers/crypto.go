@@ -21,11 +21,14 @@ func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 		return
 	}
 
+	totalValue := 0.0
+	// Calculate the current value of the coins
 	for i := range coins {
 		if coins[i].CryptoPriceZar != nil && coins[i].CryptoAmountHolding != nil {
 			temp := *coins[i].CryptoPriceZar * *coins[i].CryptoAmountHolding
 			coins[i].CurrentValueZar = &temp
 		}
+		totalValue += *coins[i].CurrentValueZar
 	}
 
 	sort.Slice(coins, func(i, j int) bool {
@@ -39,6 +42,7 @@ func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 	c.HTML(http.StatusOK, "crypto_portfolio.html", gin.H{
 		"now":         time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
 		"CryptoCoins": coins,
+		"TotalValue":  totalValue,
 	})
 }
 
