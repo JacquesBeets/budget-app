@@ -1,4 +1,14 @@
-<div class="title"><h1 >Dashboard</h1> <input type="date" name="date" id="date"></div>
+<div class="title">
+    <h1>Dashboard</h1>
+    <div class="custom-month-input">
+        <input type="month" name="date" id="date" hx-get="/components/transactions" hx-trigger="change" hx-target="#content" hx-swap="innerHTML">
+        <div class="icon">&#x1F4C5;</div>
+    </div>
+</div>
 
 
 <div hx-get="/components/transactions" hx-trigger="load" hx-swap="innerHTML"></div>
+
+<script>
+    document.querySelector('#date').value = new Date().toISOString().slice(0, 7);
+</script>

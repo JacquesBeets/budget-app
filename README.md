@@ -66,3 +66,4 @@ make clean
 - [ ] Add a crypto holdings history tracker (Adda table to store portfolio value over time - perhaps just save the total evrythime the amounts are updated)
 - [ ] Auto update crypto holdings once a day
 - [ ] Add email report functionality (weekly, monthly)
+- [ ] Add alert if budget item is not yet paid at a certain date

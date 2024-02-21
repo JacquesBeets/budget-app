@@ -2,6 +2,13 @@
     <h1>Transactions 
     <!-- <button hx-post="/transactions/duplicate/remove" hx-trigger="click">Remove Duplicates</button> -->
 </h1>
+<div class="custom-month-input">
+    <input type="month" name="date" id="date" hx-get="/templates/transactions" hx-trigger="change" hx-target="#content" hx-swap="innerHTML">
+    <div class="icon">&#x1F4C5;</div>
+    <script>
+        document.querySelector('#date').value = new Date().toISOString().slice(0, 7);
+    </script>
+</div>
 </div>
 <div class="tableContainer">
     <div class="border">

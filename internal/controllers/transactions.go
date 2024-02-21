@@ -115,11 +115,18 @@ type BudgetItemWithTotal struct {
 }
 
 func (ge *GinEngine) HandleTransctions(c *gin.Context) {
+	date := c.Query("date")
+	if date == "" {
+		date = "now"
+	} else {
+		date = date + "-01"
+	}
+
 	r := ge.Router
 	r.LoadHTMLFiles(RecentTransactionComponent)
 
 	var transactions []models.Transaction
-	response := ge.db().Joins("Budget").Joins("TransactionType").Where(StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	response := ge.db().Joins("Budget").Joins("TransactionType").Where(StringQuery, date, StartDayOfMonth, date, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
 	if response.Error != nil {
 		r.LoadHTMLFiles(ErrorHTML)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
@@ -128,7 +135,7 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 	}
 
 	var budetsItems []models.Budget
-	response = ge.db().Preload("Transactions", StringQuery, DateNow, StartDayOfMonth, DateNow, StartDayOfMonth).Order("amount desc").Find(&budetsItems)
+	response = ge.db().Preload("Transactions", StringQuery, date, StartDayOfMonth, date, StartDayOfMonth).Order("amount desc").Find(&budetsItems)
 	if response.Error != nil {
 		r.LoadHTMLFiles(ErrorHTML)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
@@ -207,11 +214,18 @@ type TransactionData struct {
 }
 
 func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
+	date := c.Query("date") // 2024-02
+	if date == "" {
+		date = "now"
+	} else {
+		date = date + "-01"
+	}
+
 	r := ge.Router
 	r.LoadHTMLFiles(Transactions)
 
 	var transactions []models.Transaction
-	response := ge.db().Preload("Budget").Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	response := ge.db().Preload("Budget").Where(StringQuery, date, StartDayOfMonth, date, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
 	if response.Error != nil {
 		ge.ReturnErrorPage(c, response.Error)
 		return
