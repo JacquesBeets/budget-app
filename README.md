@@ -47,3 +47,22 @@ clean up binary from the last build
 ```bash
 make clean
 ```
+
+
+## TODO
+
+- [ ] More UI styling
+- [ ] Add tests
+- [ ] Auto download and import transactions from bank
+- [ ] Add month/date selector for transactions
+- [ ] Add edit functionality in the CRUD ui's
+- [ ] Add delete functionality in the CRUD ui's
+- [ ] Add a login page
+- [ ] Scan receipts and add to transaction
+- [ ] Use AI to categorize transactions
+- [ ] Add a debt tracker (outside of the banking transactions)
+- [ ] Add a savings tracker
+- [ ] Add a wallet scanner for crypto holdings
+- [ ] Add a crypto holdings history tracker (Adda table to store portfolio value over time - perhaps just save the total evrythime the amounts are updated)
+- [ ] Auto update crypto holdings once a day
+- [ ] Add email report functionality (weekly, monthly)
