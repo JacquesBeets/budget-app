@@ -61,6 +61,7 @@ func HandleComponents(r *gin.Engine) {
 	views := controllers.ReturnViewsRouter(r)
 
 	r.GET("components/transactions", views.HandleTransctions)
+	r.GET("transactions/download", views.DownloadTransactions)
 	r.GET("components/budget/form", views.ReturnBudgetForm)
 	r.GET("/crypto/fetch/prices", views.FetchCurrentCrypoPrices)
 

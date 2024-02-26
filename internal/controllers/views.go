@@ -101,6 +101,14 @@ func (ge *GinEngine) UploadPageRefreshed(c *gin.Context) {
 	})
 }
 
+func (ge *GinEngine) DownloadTransactions(c *gin.Context) {
+
+	DownloadFnb()
+	// DownloadNed()
+
+	ge.ReturnTransactions(c)
+}
+
 type UniqueFields struct {
 	ID                uint
 	TransactionDate   time.Time
