@@ -129,6 +129,11 @@ func DownloadNed() error {
 	// })
 	assertErrorToNilf("could not launch Chromium: %w", err)
 
+	defer func() {
+		browser.Close()
+		pw.Stop()
+	}()
+
 	// Create New Page
 	page, err := browser.NewPage()
 	assertErrorToNilf("could not create page: %w", err)
@@ -137,21 +142,21 @@ func DownloadNed() error {
 	_, err = page.Goto(website)
 	assertErrorToNilf("could not goto: %w", err)
 
-	// time.Sleep(2 * time.Second) // Wait for 2 seconds
+	time.Sleep(2 * time.Second) // Wait for 2 seconds
 
 	assertErrorToNilf("could not select Use Nedbank ID to log in: %v", page.Locator(`[aria-label="Use Nedbank ID to log in"]`).Click())
 
-	// time.Sleep(3 * time.Second) // Wait for 3 seconds
+	time.Sleep(3 * time.Second) // Wait for 3 seconds
 
 	// Fill in Username
 	assertErrorToNilf("could not type: %v", page.Locator("input#username").Fill(usern))
 
-	// time.Sleep(3 * time.Second) // Wait for 3 seconds
+	time.Sleep(3 * time.Second) // Wait for 3 seconds
 
 	// Fill in Password
 	assertErrorToNilf("could not type: %v", page.Locator("input#password").Fill(pass))
 
-	// time.Sleep(3 * time.Second) // Wait for 3 seconds
+	time.Sleep(3 * time.Second) // Wait for 3 seconds
 
 	// Click Login
 	assertErrorToNilf("could not press: %v", page.Locator("#log_in").Click())
@@ -160,7 +165,7 @@ func DownloadNed() error {
 	frame := page.MainFrame()
 	_ = frame.WaitForURL(waitForLogin)
 
-	// time.Sleep(3 * time.Second) // Wait for 3 seconds
+	time.Sleep(3 * time.Second) // Wait for 3 seconds
 
 	assertErrorToNilf("could not select statement-position: %v", page.Locator(`//*[@id="scroll-page"]/div/div[1]/div/app-landing/section/app-landing/div[1]/div/div[2]/div/div/div/div[1]/a`).Click())
 
@@ -168,23 +173,23 @@ func DownloadNed() error {
 
 	assertErrorToNilf("could not select statement enquiry tab: %v", page.Locator(`//*[@id="scroll-page"]/div/div[1]/div/app-landing/section/app-statement-documents-global/div/section/section[1]/app-toggle-tab-group/div/div[2]/label`).Click())
 
-	// time.Sleep(3 * time.Second) // Wait for 2 seconds
+	time.Sleep(3 * time.Second) // Wait for 2 seconds
 
 	assertErrorToNilf("could not open Enquire by dropdown: %v", page.Locator(`.enquireby-options app-enquiry-dropdown .gd-dropdown .discrp-block`).Click())
 
-	// time.Sleep(2 * time.Second) // Wait for 2 seconds
+	time.Sleep(2 * time.Second) // Wait for 2 seconds
 
 	assertErrorToNilf("could not select Enquire by dropdown: %v", page.Locator(`//*[@id="scroll-page"]/div/div[1]/div/app-landing/section/app-statement-documents-global/div/section/section[2]/div/app-statements-enquiry/form/div/div[1]/app-enquiry-dropdown/div/ul/li[2]`).Click())
 
-	// time.Sleep(2 * time.Second) // Wait for 2 seconds
+	time.Sleep(2 * time.Second) // Wait for 2 seconds
 
 	assertErrorToNilf("could not open Format dropdown: %v", page.Locator(`//*[@id="scroll-page"]/div/div[1]/div/app-landing/section/app-statement-documents-global/div/section/section[2]/div/app-statements-enquiry/form/div/app-enquiry-dropdown/div/div`).Click())
 
-	// time.Sleep(2 * time.Second) // Wait for 2 seconds
+	time.Sleep(2 * time.Second) // Wait for 2 seconds
 
 	assertErrorToNilf("could not select OFX option: %v", page.Locator(`//*[@id="scroll-page"]/div/div[1]/div/app-landing/section/app-statement-documents-global/div/section/section[2]/div/app-statements-enquiry/form/div/app-enquiry-dropdown/div/ul/li[3]`).Click())
 
-	// time.Sleep(2 * time.Second) // Wait for 2 seconds
+	time.Sleep(2 * time.Second) // Wait for 2 seconds
 
 	//Download
 	download, err := page.ExpectDownload(func() error {
@@ -212,9 +217,6 @@ func DownloadNed() error {
 	err = CleanUpDownloads()
 	assertErrorToNilf("could not clean up: %w", err)
 
-	assertErrorToNilf("could not close browser: %w", browser.Close())
-	assertErrorToNilf("could not stop Playwright: %w", pw.Stop())
-
 	log.Printf("Completed NED Download")
 	return nil
 }
@@ -233,6 +235,11 @@ func DownloadFnb() error {
 
 	// Launch Browser
 	browser, err := pw.Chromium.Launch()
+
+	defer func() {
+		browser.Close()
+		pw.Stop()
+	}()
 
 	// Luanch Browser with UI
 	// browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
@@ -328,9 +335,6 @@ func DownloadFnb() error {
 	_ = frame.WaitForURL(waitForLogout)
 
 	time.Sleep(3 * time.Second) // Wait for 3 seconds
-
-	assertErrorToNilf("could not close browser: %w", browser.Close())
-	assertErrorToNilf("could not stop Playwright: %w", pw.Stop())
 
 	// Unzip
 	err = Unzip("./downloads/fnb_ofx.zip", "./unzipped")
