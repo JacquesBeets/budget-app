@@ -48,7 +48,21 @@ func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 
 func (ge *GinEngine) FetchCurrentCrypoPrices(c *gin.Context) {
 	cryptoCoins := models.CryptoCoins{}
+	cryptoHistory := models.CryptoPortfolioHistories{}
+
 	_, err := cryptoCoins.FetchAll(ge.db())
+	if err != nil {
+		ge.ReturnErrorJSON(c, err)
+		return
+	}
+
+	newHistories, err := cryptoHistory.New(ge.db(), cryptoCoins)
+	if err != nil {
+		ge.ReturnErrorJSON(c, err)
+		return
+	}
+
+	_, err = newHistories.Save(ge.db())
 	if err != nil {
 		ge.ReturnErrorJSON(c, err)
 		return

@@ -4,15 +4,11 @@ import "gorm.io/gorm"
 
 type CryptoPortfolioHistory struct {
 	gorm.Model
-	CryptoCoinID                         uint       `json:"cryptoCoinID" gorm:"not null"`
-	CryptoCoin                           CryptoCoin `json:"cryptoCoin" gorm:"foreignKey:CryptoCoinID"`
-	CryptoCoinPrice                      float64    `json:"cryptoCoinPrice"`
-	CryptoCoinAmount                     float64    `json:"cryptoCoinAmount"`
-	CryptoCoinValue                      float64    `json:"cryptoCoinValue"`
-	CryptoCoinValueZar                   float64    `json:"cryptoCoinValueZar"`
-	CryptoCoinValueZarTotal              float64    `json:"cryptoCoinValueZarTotal"`
-	CryptoCoinValueZarTotalChange        float64    `json:"cryptoCoinValueZarTotalChange"`
-	CryptoCoinValueZarTotalChangePercent float64    `json:"cryptoCoinValueZarTotalChangePercent"`
+	CryptoCoinID            uint       `json:"cryptoCoinID" gorm:"not null"`
+	CryptoCoin              CryptoCoin `json:"cryptoCoin" gorm:"foreignKey:CryptoCoinID"`
+	CryptoCoinPrice         float64    `json:"cryptoCoinPrice"`
+	CryptoCoinPriceZar      float64    `json:"cryptoCoinPriceZar"`
+	CryptoCoinAmountHolding float64    `json:"cryptoCoinAmountHolding"`
 }
 
 type CryptoPortfolioHistories []CryptoPortfolioHistory
@@ -21,22 +17,28 @@ func (c *CryptoPortfolioHistory) New(
 	coinID uint,
 	coinPrice float64,
 	coinAmount float64,
-	coinValue float64,
 	coinValueZar float64,
-	coinValueZarTotal float64,
-	coinValueZarTotalChange float64,
-	coinValueZarTotalChangePercent float64,
 ) (*CryptoPortfolioHistory, error) {
 	return &CryptoPortfolioHistory{
 		CryptoCoinID:                         coinID,
 		CryptoCoinPrice:                      coinPrice,
-		CryptoCoinAmount:                     coinAmount,
-		CryptoCoinValue:                      coinValue,
-		CryptoCoinValueZar:                   coinValueZar,
-		CryptoCoinValueZarTotal:              coinValueZarTotal,
-		CryptoCoinValueZarTotalChange:        coinValueZarTotalChange,
-		CryptoCoinValueZarTotalChangePercent: coinValueZarTotalChangePercent,
+		CryptoCoinPriceZar:                   coinValueZar,
+		CryptoCoinAmountHolding:              coinAmount,
 	}, nil
+}
+
+func (c *CryptoPortfolioHistories) New(tx *gorm.DB, freshCoins CryptoCoins) (*CryptoPortfolioHistories, error) {
+	var cryptoPortfolioHistories CryptoPortfolioHistories
+	for _, coin := range freshCoins {
+		cryptoPortfolioHistory := CryptoPortfolioHistory{
+			CryptoCoinID:                         coin.ID,
+			CryptoCoinPrice:                      *coin.CryptoPrice,
+			CryptoCoinPriceZar:                   *coin.CryptoPriceZar,
+			CryptoCoinAmountHolding:              *coin.CryptoAmountHolding,
+		}
+		cryptoPortfolioHistories = append(cryptoPortfolioHistories, cryptoPortfolioHistory)
+	}
+	return &cryptoPortfolioHistories, nil
 }
 
 func (c *CryptoPortfolioHistories) FetchAll(tx *gorm.DB) (*gorm.DB, error) {
@@ -65,6 +67,14 @@ func (c *CryptoPortfolioHistory) Update(tx *gorm.DB) (*gorm.DB, error) {
 
 func (c *CryptoPortfolioHistory) Delete(tx *gorm.DB, id uint) (*gorm.DB, error) {
 	response := tx.Delete(&c, id)
+	if response.Error != nil {
+		return response, response.Error
+	}
+	return response, nil
+}
+
+func (c *CryptoPortfolioHistories) Save(tx *gorm.DB) (*gorm.DB, error) {
+	response := tx.Create(&c).Scan(&c)
 	if response.Error != nil {
 		return response, response.Error
 	}

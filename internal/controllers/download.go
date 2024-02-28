@@ -14,7 +14,7 @@ import (
 
 func assertErrorToNilf(message string, err error) {
 	if err != nil {
-		log.Fatalf(message, err)
+		log.Println(message, err)
 	}
 }
 
