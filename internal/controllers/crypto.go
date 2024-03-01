@@ -12,6 +12,7 @@ import (
 
 func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 	var coins models.CryptoCoins
+	var cryptoHistory models.CryptoPortfolioHistories
 	r := ge.Router
 	r.LoadHTMLFiles(Crypto)
 
@@ -20,6 +21,17 @@ func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 		ge.ReturnErrorPage(c, err)
 		return
 	}
+
+	_, err = cryptoHistory.FetchAll(ge.db())
+	if err != nil {
+		ge.ReturnErrorPage(c, err)
+		return
+	}
+
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"OK":    http.StatusOK,
+	// 	"VALUE": cryptoHistory,
+	// })
 
 	totalValue := 0.0
 	// Calculate the current value of the coins

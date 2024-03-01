@@ -1,6 +1,8 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type CryptoPortfolioHistory struct {
 	gorm.Model
@@ -20,10 +22,10 @@ func (c *CryptoPortfolioHistory) New(
 	coinValueZar float64,
 ) (*CryptoPortfolioHistory, error) {
 	return &CryptoPortfolioHistory{
-		CryptoCoinID:                         coinID,
-		CryptoCoinPrice:                      coinPrice,
-		CryptoCoinPriceZar:                   coinValueZar,
-		CryptoCoinAmountHolding:              coinAmount,
+		CryptoCoinID:            coinID,
+		CryptoCoinPrice:         coinPrice,
+		CryptoCoinPriceZar:      coinValueZar,
+		CryptoCoinAmountHolding: coinAmount,
 	}, nil
 }
 
@@ -31,22 +33,14 @@ func (c *CryptoPortfolioHistories) New(tx *gorm.DB, freshCoins CryptoCoins) (*Cr
 	var cryptoPortfolioHistories CryptoPortfolioHistories
 	for _, coin := range freshCoins {
 		cryptoPortfolioHistory := CryptoPortfolioHistory{
-			CryptoCoinID:                         coin.ID,
-			CryptoCoinPrice:                      *coin.CryptoPrice,
-			CryptoCoinPriceZar:                   *coin.CryptoPriceZar,
-			CryptoCoinAmountHolding:              *coin.CryptoAmountHolding,
+			CryptoCoinID:            coin.ID,
+			CryptoCoinPrice:         *coin.CryptoPrice,
+			CryptoCoinPriceZar:      *coin.CryptoPriceZar,
+			CryptoCoinAmountHolding: *coin.CryptoAmountHolding,
 		}
 		cryptoPortfolioHistories = append(cryptoPortfolioHistories, cryptoPortfolioHistory)
 	}
 	return &cryptoPortfolioHistories, nil
-}
-
-func (c *CryptoPortfolioHistories) FetchAll(tx *gorm.DB) (*gorm.DB, error) {
-	response := tx.Preload("CryptoCoin").Order("created_at desc").Find(&c).Scan(&c)
-	if response.Error != nil {
-		return response, response.Error
-	}
-	return response, nil
 }
 
 func (c *CryptoPortfolioHistory) FetchOne(tx *gorm.DB, id uint) (*gorm.DB, error) {
@@ -73,8 +67,42 @@ func (c *CryptoPortfolioHistory) Delete(tx *gorm.DB, id uint) (*gorm.DB, error) 
 	return response, nil
 }
 
+func (c *CryptoPortfolioHistories) FetchAll(tx *gorm.DB) (*gorm.DB, error) {
+	// response := tx.Preload("CryptoCoin").Find(&c).Scan(&c)
+	response := tx.Preload("CryptoCoin").Order("created_at desc").Limit(1).Find(&c)
+	if response.Error != nil {
+		return response, response.Error
+	}
+	return response, nil
+
+	// Raw SQL query with subquery to fetch the latest CryptoPortfolioHistory for each CryptoCoinID
+	// subQuery := "(SELECT MAX(created_at) as max_created_at, crypto_coin_id FROM crypto_portfolio_histories GROUP BY crypto_coin_id) AS sub"
+	// query := fmt.Sprintf("SELECT * FROM crypto_portfolio_histories INNER JOIN %s ON crypto_portfolio_histories.created_at = %s.max_created_at AND crypto_portfolio_histories.crypto_coin_id = %s.crypto_coin_id", subQuery, subQuery, subQuery)
+
+	// response := tx.Raw(query).Preload("CryptoCoin").Scan(&c)
+	// if response.Error != nil {
+	// 	return nil, response.Error
+	// }
+
+	// return response, nil
+}
+
+func (c *CryptoPortfolioHistories) Print() {
+	for _, history := range *c {
+		println(history.CryptoCoin.CryptoName, "===", history.CryptoCoinID)
+	}
+}
+
 func (c *CryptoPortfolioHistories) Save(tx *gorm.DB) (*gorm.DB, error) {
 	response := tx.Create(&c).Scan(&c)
+	if response.Error != nil {
+		return response, response.Error
+	}
+	return response, nil
+}
+
+func (c *CryptoPortfolioHistories) FetchLatest(tx *gorm.DB, coins *CryptoCoins) (*gorm.DB, error) {
+	response := tx.Preload("CryptoCoin").Order("created_at desc").First(&c).Scan(&c)
 	if response.Error != nil {
 		return response, response.Error
 	}
