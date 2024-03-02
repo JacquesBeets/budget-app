@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"budget-app/internal/models"
+	"budget-app/internal/utils"
 	"net/http"
 	"sort"
 	"strconv"
@@ -21,13 +22,11 @@ func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 	r := ge.Router
 	r.LoadHTMLFiles(Crypto)
 
-	_, err := coins.FetchAll(ge.db())
+	coinIds, err := coins.ReturnAllIds(ge.db())
 	if err != nil {
 		ge.ReturnErrorPage(c, err)
 		return
 	}
-
-	coinIds := coins.ReturnAllIds() // TODO: Create SQL query to return all ids instead of fetching all coins
 
 	_, err = cryptoHistories.FetchAll(ge.db(), coinIds)
 	if err != nil {
@@ -36,15 +35,26 @@ func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 	}
 
 	totalValue := 0.0
+	prevTotalValue := 0.0
+	bestPerformingCoin := models.CryptoPortfolioHistory{}
 	coinData := []CoinData{}
 	for i := range cryptoHistories {
 		coinHist := cryptoHistories[i]
 
+		// Calculate the current value of the coin
 		if coinHist.CryptoCoin.CryptoPriceZar != nil && coinHist.CryptoCoin.CryptoAmountHolding != nil {
 			temp := *coinHist.CryptoCoin.CryptoPriceZar * *coinHist.CryptoCoin.CryptoAmountHolding
 			coinHist.CryptoCoin.CurrentValueZar = &temp
 		}
 		totalValue += *coinHist.CryptoCoin.CurrentValueZar
+
+		// Calculate the previous total value
+		prevTotalValue += coinHist.CryptoCoinPriceZar * coinHist.CryptoCoinAmountHolding
+
+		// Find the best performing coin
+		if bestPerformingCoin.ID == 0 || coinHist.CalculatePercentageChange() > bestPerformingCoin.CalculatePercentageChange() {
+			bestPerformingCoin = coinHist
+		}
 
 		coinData = append(coinData, CoinData{
 			CoinHistory:   coinHist,
@@ -68,9 +78,15 @@ func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 	})
 
 	c.HTML(http.StatusOK, "crypto_portfolio.html", gin.H{
-		"CryptoCoins": coins,
-		"TotalValue":  totalValue,
-		"CoinData":    coinData,
+		"CryptoCoins":                 coins,
+		"TotalValue":                  totalValue,
+		"CoinData":                    coinData,
+		"PrevTotalValue":              prevTotalValue,
+		"TotalValuePercentChange":     utils.CalculatePercentageChange(prevTotalValue, totalValue),
+		"PrevTotalValuePercentChange": utils.CalculatePercentageChange(totalValue, prevTotalValue),
+		"BestPerformingCoin":          bestPerformingCoin,
+		"BestPerformingCoinPrice":     *bestPerformingCoin.CryptoCoin.CryptoPriceZar * *bestPerformingCoin.CryptoCoin.CryptoAmountHolding,
+		"BestPerformingCoinPercent":   bestPerformingCoin.CalculatePercentageChange(),
 	})
 }
 

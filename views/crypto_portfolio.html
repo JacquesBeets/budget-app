@@ -6,9 +6,9 @@
 <section class="cards">
     <div class="card">
         <div class="cardHead">
-            <h3 class="">Total Value</h3>
+            <h3 class="">Current Value</h3>
             <span>
-                +
+                
                 <svg xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                 stroke-width="2" class="h-4 w-4 text-muted-foreground">
@@ -18,14 +18,13 @@
         </div>
         <footer class="">
             <div class="text-2xl">R {{ formatPrice .TotalValue }}</div>
-            <p class="muted"><small>+20.1% from last month</small></p>
+            <p class="muted"><small>{{.TotalValuePercentChange}}% from last fetch</small></p>
         </footer>
     </div>
     <div class="card ">
         <div class=" cardHead">
-            <h3 class="">Total Spent</h3>
+            <h3 class="">Previous Value</h3>
             <span>
-                -
                 <svg xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                 stroke-width="2" class="h-4 w-4 text-muted-foreground">
@@ -34,26 +33,30 @@
             </span>
         </div>
         <footer class="">
-            <div class="text-2xl">R {{ formatPrice .TotalValue }}</div>
-            <p class="muted"><small>+180.1% from last month</small></p>
+            <div class="text-2xl">R {{ formatPrice .PrevTotalValue }}</div>
+            <p class="muted"><small>{{.PrevTotalValuePercentChange}}% from last fetch</small></p>
         </footer>
     </div>
     <div class=" card ">
         <div class="cardHead">
-            <h3 class="">Budget</h3>
+            <h3 class="">Best Performing Coin</h3>
             <span>
-                -
                 <svg xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                 stroke-width="2" class="h-4 w-4 text-muted-foreground">
-                <rect width="20" height="14" x="2" y="5" rx="2"></rect>
-                <path d="M2 10h20"></path>
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
             </svg>
             </span>
         </div>
         <footer class="">
-            <div class="text-2xl">R {{ formatPrice .TotalValue }}</div>
-            <p class="muted"><small>Current budget spend is: R {{ formatPrice .TotalValue }}</small></p>
+            <div class="text-2xl">
+                {{ .BestPerformingCoin.CryptoCoin.CryptoName }} &bullet; R {{ formatPrice .BestPerformingCoinPrice }}
+            </div>
+            <p class="muted">
+                <small>
+                    {{ .BestPerformingCoinPercent }}% percent change since last update
+                </small>
+            </p>
         </footer>
     </div>
     <div class=" card ">
@@ -118,6 +121,8 @@
             {{ end }}
         </ul>
     </div>
+</section>
+
 
     <!-- <div class="monthlyBudget border">
         <h3>

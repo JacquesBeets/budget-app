@@ -52,12 +52,13 @@ func (c *CryptoCoins) FetchAll(tx *gorm.DB) (*gorm.DB, error) {
 	return response, nil
 }
 
-func (c *CryptoCoins) ReturnAllIds() (CryptoCoinIDs) {
+func (c *CryptoCoins) ReturnAllIds(tx *gorm.DB) (CryptoCoinIDs, error) {
 	var ids CryptoCoinIDs
-	for _, coin := range *c {
-		ids = append(ids, coin.ID)
+	response := tx.Model(&c).Select("id").Find(&ids)
+	if response.Error != nil {
+		return nil, response.Error
 	}
-	return ids
+	return ids, nil
 }
 
 func (c *CryptoCoins) Print() {
