@@ -121,9 +121,22 @@
                 {{ end }}
             </ul>
         </div>
+            
+        <div class="monthlyBudget border">
+            <h3>
+                Crypto Porfolio Chart
+                <!-- <small class="muted">Some text can go here...</small> -->
+            </h3>
+            <div>
+                <iframe id="addBudget" src="/templates/linechart"  onload="this.style.height=this.contentDocument.body.scrollHeight +'px';" width="100%"></iframe>
+            </div>
+        </div>
     </section>
     
-    
+
+
+
+
         <!-- <div class="monthlyBudget border">
             <h3>
                 Add/View Transaction Type

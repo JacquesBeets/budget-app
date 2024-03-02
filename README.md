@@ -2,6 +2,13 @@
 
 One Paragraph of project description goes here
 
+##  Kill service on port
+
+```bash
+sudo lsof -i :9090
+kill -9 <PID>
+```
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.

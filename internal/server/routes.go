@@ -55,6 +55,7 @@ func HandleViews(r *gin.Engine) {
 	r.GET("templates/transactions", views.ReturnTransactions)
 	r.GET("templates/transactionstypes", views.ReturnTransactionTypes)
 	r.GET("templates/crypto", views.ReturnCryptoView)
+	r.GET("templates/linechart", views.RenderLineChart)
 }
 
 func HandleComponents(r *gin.Engine) {
