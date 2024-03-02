@@ -123,10 +123,10 @@ func DownloadNed() error {
 	assertErrorToNilf("could not launch playwright: %w", err)
 
 	// Launch Browser with UI
-	browser, err := pw.Chromium.Launch()
-	// browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
-	// 	Headless: playwright.Bool(false),
-	// })
+	// browser, err := pw.Chromium.Launch()
+	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
+		Headless: playwright.Bool(false),
+	})
 	assertErrorToNilf("could not launch Chromium: %w", err)
 
 	defer func() {
@@ -234,17 +234,17 @@ func DownloadFnb() error {
 	assertErrorToNilf("could not launch playwright: %w", err)
 
 	// Launch Browser
-	browser, err := pw.Chromium.Launch()
+	// browser, err := pw.Chromium.Launch()
+
+	// Luanch Browser with UI
+	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
+		Headless: playwright.Bool(false),
+	})
 
 	defer func() {
 		browser.Close()
 		pw.Stop()
 	}()
-
-	// Luanch Browser with UI
-	// browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
-	// 	Headless: playwright.Bool(false),
-	// })
 	assertErrorToNilf("could not launch Chromium: %w", err)
 
 	// Create New Page

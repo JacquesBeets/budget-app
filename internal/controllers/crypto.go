@@ -5,14 +5,19 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
+type CoinData struct {
+	CoinHistory   models.CryptoPortfolioHistory
+	Coin          models.CryptoCoin
+	PercentChange float64
+}
+
 func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 	var coins models.CryptoCoins
-	var cryptoHistory models.CryptoPortfolioHistories
+	var cryptoHistories models.CryptoPortfolioHistories
 	r := ge.Router
 	r.LoadHTMLFiles(Crypto)
 
@@ -22,26 +27,37 @@ func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 		return
 	}
 
-	_, err = cryptoHistory.FetchAll(ge.db())
+	coinIds := coins.ReturnAllIds() // TODO: Create SQL query to return all ids instead of fetching all coins
+
+	_, err = cryptoHistories.FetchAll(ge.db(), coinIds)
 	if err != nil {
 		ge.ReturnErrorPage(c, err)
 		return
 	}
 
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"OK":    http.StatusOK,
-	// 	"VALUE": cryptoHistory,
-	// })
-
 	totalValue := 0.0
-	// Calculate the current value of the coins
-	for i := range coins {
-		if coins[i].CryptoPriceZar != nil && coins[i].CryptoAmountHolding != nil {
-			temp := *coins[i].CryptoPriceZar * *coins[i].CryptoAmountHolding
-			coins[i].CurrentValueZar = &temp
+	coinData := []CoinData{}
+	for i := range cryptoHistories {
+		coinHist := cryptoHistories[i]
+
+		if coinHist.CryptoCoin.CryptoPriceZar != nil && coinHist.CryptoCoin.CryptoAmountHolding != nil {
+			temp := *coinHist.CryptoCoin.CryptoPriceZar * *coinHist.CryptoCoin.CryptoAmountHolding
+			coinHist.CryptoCoin.CurrentValueZar = &temp
 		}
-		totalValue += *coins[i].CurrentValueZar
+		totalValue += *coinHist.CryptoCoin.CurrentValueZar
+
+		coinData = append(coinData, CoinData{
+			CoinHistory:   coinHist,
+			Coin:          coinHist.CryptoCoin,
+			PercentChange: coinHist.CalculatePercentageChange(),
+		})
 	}
+
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"CoinData":    coinData,
+	// 	"TotalValue":  totalValue,
+	// 	"CryptoCoins": coins,
+	// })
 
 	sort.Slice(coins, func(i, j int) bool {
 		// Check if the values are not nil to avoid a runtime panic
@@ -52,15 +68,15 @@ func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 	})
 
 	c.HTML(http.StatusOK, "crypto_portfolio.html", gin.H{
-		"now":         time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
 		"CryptoCoins": coins,
 		"TotalValue":  totalValue,
+		"CoinData":    coinData,
 	})
 }
 
 func (ge *GinEngine) FetchCurrentCrypoPrices(c *gin.Context) {
 	cryptoCoins := models.CryptoCoins{}
-	cryptoHistory := models.CryptoPortfolioHistories{}
+	cryptoHistories := models.CryptoPortfolioHistories{}
 
 	_, err := cryptoCoins.FetchAll(ge.db())
 	if err != nil {
@@ -68,19 +84,19 @@ func (ge *GinEngine) FetchCurrentCrypoPrices(c *gin.Context) {
 		return
 	}
 
-	newHistories, err := cryptoHistory.New(ge.db(), cryptoCoins)
+	_, err = cryptoCoins.UpdatePrices(ge.db())
+	if err != nil {
+		ge.ReturnErrorJSON(c, err)
+		return
+	}
+
+	newHistories, err := cryptoHistories.New(ge.db(), cryptoCoins)
 	if err != nil {
 		ge.ReturnErrorJSON(c, err)
 		return
 	}
 
 	_, err = newHistories.Save(ge.db())
-	if err != nil {
-		ge.ReturnErrorJSON(c, err)
-		return
-	}
-
-	_, err = cryptoCoins.UpdatePrices(ge.db())
 	if err != nil {
 		ge.ReturnErrorJSON(c, err)
 		return

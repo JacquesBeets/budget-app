@@ -23,6 +23,7 @@ type CryptoCoin struct {
 }
 
 type CryptoCoins []CryptoCoin
+type CryptoCoinIDs []uint
 
 var (
 	coinGeckoURL    = os.Getenv("COINGECKO_API_URL")
@@ -49,6 +50,14 @@ func (c *CryptoCoins) FetchAll(tx *gorm.DB) (*gorm.DB, error) {
 		return response, response.Error
 	}
 	return response, nil
+}
+
+func (c *CryptoCoins) ReturnAllIds() (CryptoCoinIDs) {
+	var ids CryptoCoinIDs
+	for _, coin := range *c {
+		ids = append(ids, coin.ID)
+	}
+	return ids
 }
 
 func (c *CryptoCoins) Print() {

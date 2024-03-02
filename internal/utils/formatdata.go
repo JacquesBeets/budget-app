@@ -78,3 +78,7 @@ func FormatPrice(p float64) string {
 	// Return the formatted price
 	return integerPart + "." + parts[1]
 }
+
+func CalculatePercentageChange(old float64, new float64) float64 {
+	return ((new - old) / old) * 100
+}

@@ -1,6 +1,9 @@
 package models
 
 import (
+	"budget-app/internal/utils"
+	"fmt"
+
 	"gorm.io/gorm"
 )
 
@@ -43,6 +46,10 @@ func (c *CryptoPortfolioHistories) New(tx *gorm.DB, freshCoins CryptoCoins) (*Cr
 	return &cryptoPortfolioHistories, nil
 }
 
+func (c *CryptoPortfolioHistory) CalculatePercentageChange() float64 {
+	return utils.CalculatePercentageChange(c.CryptoCoinPrice, *c.CryptoCoin.CryptoPrice)
+}
+
 func (c *CryptoPortfolioHistory) FetchOne(tx *gorm.DB, id uint) (*gorm.DB, error) {
 	response := tx.Preload("CryptoCoin").First(&c, id).Scan(&c)
 	if response.Error != nil {
@@ -67,29 +74,20 @@ func (c *CryptoPortfolioHistory) Delete(tx *gorm.DB, id uint) (*gorm.DB, error) 
 	return response, nil
 }
 
-func (c *CryptoPortfolioHistories) FetchAll(tx *gorm.DB) (*gorm.DB, error) {
-	// response := tx.Preload("CryptoCoin").Find(&c).Scan(&c)
-	response := tx.Preload("CryptoCoin").Order("created_at desc").Limit(1).Find(&c)
+func (c *CryptoPortfolioHistories) FetchAll(tx *gorm.DB, ids CryptoCoinIDs) (*gorm.DB, error) {
+
+	response := tx.Preload("CryptoCoin").Where("crypto_coin_id IN ?", ids).Order("created_at desc").Limit(len(ids)).Find(&c)
+	// response := tx.Where("crypto_coin_id IN ?", ids).Order("created_at desc").Limit(len(ids)).Find(&c)
 	if response.Error != nil {
 		return response, response.Error
 	}
+
 	return response, nil
-
-	// Raw SQL query with subquery to fetch the latest CryptoPortfolioHistory for each CryptoCoinID
-	// subQuery := "(SELECT MAX(created_at) as max_created_at, crypto_coin_id FROM crypto_portfolio_histories GROUP BY crypto_coin_id) AS sub"
-	// query := fmt.Sprintf("SELECT * FROM crypto_portfolio_histories INNER JOIN %s ON crypto_portfolio_histories.created_at = %s.max_created_at AND crypto_portfolio_histories.crypto_coin_id = %s.crypto_coin_id", subQuery, subQuery, subQuery)
-
-	// response := tx.Raw(query).Preload("CryptoCoin").Scan(&c)
-	// if response.Error != nil {
-	// 	return nil, response.Error
-	// }
-
-	// return response, nil
 }
 
 func (c *CryptoPortfolioHistories) Print() {
 	for _, history := range *c {
-		println(history.CryptoCoin.CryptoName, "===", history.CryptoCoinID)
+		fmt.Println(history, "===", history.CryptoCoinID)
 	}
 }
 

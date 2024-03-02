@@ -103,8 +103,8 @@ func (ge *GinEngine) UploadPageRefreshed(c *gin.Context) {
 
 func (ge *GinEngine) DownloadTransactions(c *gin.Context) {
 
-	DownloadFnb()
-	// DownloadNed()
+	go DownloadFnb()
+	go DownloadNed()
 
 	ge.ReturnTransactions(c)
 }
