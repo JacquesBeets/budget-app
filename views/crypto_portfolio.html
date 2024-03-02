@@ -1,36 +1,125 @@
-<div class="title"><h1>Crypto Portfolio</h1></div>
+<div class="title">
+    <h1>Crypto Portfolio</h1> <button class="updatePrices" hx-get="/crypto/fetch/prices" hx-target="#content"
+        hx-swap="innerHTML">Fetch New Prices</button>
+</div>
+
+<section class="cards">
+    <div class="card">
+        <div class="cardHead">
+            <h3 class="">Total Value</h3>
+            <span>
+                +
+                <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            </span>
+        </div>
+        <footer class="">
+            <div class="text-2xl">R {{ formatPrice .TotalValue }}</div>
+            <p class="muted"><small>+20.1% from last month</small></p>
+        </footer>
+    </div>
+    <div class="card ">
+        <div class=" cardHead">
+            <h3 class="">Total Spent</h3>
+            <span>
+                -
+                <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            </span>
+        </div>
+        <footer class="">
+            <div class="text-2xl">R {{ formatPrice .TotalValue }}</div>
+            <p class="muted"><small>+180.1% from last month</small></p>
+        </footer>
+    </div>
+    <div class=" card ">
+        <div class="cardHead">
+            <h3 class="">Budget</h3>
+            <span>
+                -
+                <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                <path d="M2 10h20"></path>
+            </svg>
+            </span>
+        </div>
+        <footer class="">
+            <div class="text-2xl">R {{ formatPrice .TotalValue }}</div>
+            <p class="muted"><small>Current budget spend is: R {{ formatPrice .TotalValue }}</small></p>
+        </footer>
+    </div>
+    <div class=" card ">
+        <div class=" cardHead">
+            <h3 class="">Total Savings</h3>
+            <span>
+                + 
+                <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
+            </span>
+        </div>
+        <footer class="">
+            <div class="text-2xl">R 200 000</div>
+            <p class="muted"><small>+201 since last hour</small></p>
+        </footer>
+    </div>
+</section>
 
 <section id="transTypeList" class="dashboardContainer">
     <div class="recentTransactions border">
         <h3>
             Crypto We Own
-            <small class="muted">R {{ formatPrice .TotalValue }}</small>
-            <button class="updatePrices"  hx-get="/crypto/fetch/prices" hx-target="#content" hx-swap="innerHTML">Fetch New Prices</button>
+            <!-- <small class="muted">More info text here</small> -->
         </h3>
-        <ul >
-            {{ range .CryptoCoins }}
+        <ul>
+            {{ range .CoinData }}
             <li>
                 <span class="flex">
                     <h5 class="uppercase">
-                        
-                        {{ .CryptoName}}
+
+                        {{ .Coin.CryptoName }} &nbsp;
+                        <span 
+                        {{if gt .PercentChange 0.0 }}
+                            class="percentChange success"
+                        {{else}}
+                            class="percentChange danger" 
+                        {{end}}
+                    >
+                        {{ .PercentChange }} %
+                    </span>
                         <small class="muted">
-                            {{ .CryptoSymbol }} 
-                            {{if and .CryptoPrice}}&bullet; $ {{formatPrice .CryptoPrice}}{{end}}
-                            {{if and .CryptoPriceZar}}&bullet; R {{formatPrice .CryptoPriceZar}}{{end}}
+                            {{ .Coin.CryptoSymbol }}
+                            {{if and .Coin.CryptoPrice}}&bullet; $ {{formatPrice .Coin.CryptoPrice}}{{end}}
+                            {{if and .Coin.CryptoPriceZar}}&bullet; R {{formatPrice .Coin.CryptoPriceZar}}{{end}}
                         </small>
                     </h5>
                 </span>
                 <span class="alignRight">
-                    R {{if and .CurrentValueZar}}{{ formatPrice .CurrentValueZar }}{{else}}0{{end}}
-                    <small class="muted">{{ formatPrice .CryptoAmountHolding}}</small>
+                    R   {{if and .Coin.CurrentValueZar}}
+                            {{ formatPrice .Coin.CurrentValueZar }}
+                        {{else}}
+                            0
+                        {{end}}
+                    <small class="muted">
+                        {{ formatPrice .Coin.CryptoAmountHolding}}
+                    </small>
                 </span>
             </li>
             {{ end }}
         </ul>
     </div>
-    
-    <div class="monthlyBudget border">
+
+    <!-- <div class="monthlyBudget border">
         <h3>
             Add/View Transaction Type
             <small class="muted">Some text can go here...</small>
@@ -47,4 +136,4 @@
             <input type="number" id="amount" name="amount" step="0.0000000001" required>
             <button type="submit">Add</button>
         </form>
-    </div>
+    </div> -->

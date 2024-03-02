@@ -45,6 +45,12 @@ small {
     line-height: 1;
 }
 
+.percentChange{
+    font-size:75%;
+    position: relative;
+    bottom: 0.3em;
+}
+
 .muted {
     opacity: 0.5;
 }

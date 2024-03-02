@@ -52,6 +52,8 @@ make clean
 ## TODO
 
 - [ ] More UI styling
+- [ ] Sort Out Routing on FE
+- [ ] Look at FE Hot Reloading
 - [ ] Add tests
 - [ ] Auto download and import transactions from bank
 - [ ] Add month/date selector for transactions

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -80,5 +81,7 @@ func FormatPrice(p float64) string {
 }
 
 func CalculatePercentageChange(old float64, new float64) float64 {
-	return ((new - old) / old) * 100
+	percentageChange := (new - old) / old * 100
+	formattedPercentageChange := math.Round(percentageChange*100) / 100
+	return formattedPercentageChange
 }
