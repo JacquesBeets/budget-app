@@ -63,16 +63,10 @@ func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 		})
 	}
 
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"CoinData":    coinData,
-	// 	"TotalValue":  totalValue,
-	// 	"CryptoCoins": coins,
-	// })
-
-	sort.Slice(coins, func(i, j int) bool {
+	sort.Slice(coinData, func(i, j int) bool {
 		// Check if the values are not nil to avoid a runtime panic
-		if coins[i].CurrentValueZar != nil && coins[j].CurrentValueZar != nil {
-			return *coins[i].CurrentValueZar > *coins[j].CurrentValueZar
+		if coinData[i].Coin.CurrentValueZar != nil && coinData[j].Coin.CurrentValueZar != nil {
+			return *coinData[i].Coin.CurrentValueZar > *coinData[j].Coin.CurrentValueZar
 		}
 		return false
 	})

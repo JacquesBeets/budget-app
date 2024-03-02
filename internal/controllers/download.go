@@ -131,7 +131,7 @@ func DownloadNed() error {
 
 	defer func() {
 		browser.Close()
-		pw.Stop()
+		// pw.Stop()
 	}()
 
 	// Create New Page
@@ -243,7 +243,7 @@ func DownloadFnb() error {
 
 	defer func() {
 		browser.Close()
-		pw.Stop()
+		// pw.Stop()
 	}()
 	assertErrorToNilf("could not launch Chromium: %w", err)
 
