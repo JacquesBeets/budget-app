@@ -373,30 +373,6 @@ button{
 
 }
 
-.icon {
-    display: none;
-    color: #FFF;
-    height: 100%;
-    padding: 1rem;
-    opacity: 0;
-    width: 0;
-}
-
-li:hover .icon{
-    display: inline;
-    width: initial;
-    opacity: 1;
-    transition: all 0.6s ease;
-}
-
-.icon svg,
-.icon img{
-    height: 1rem;
-    width: 1rem;
-    color: #FFF;
-    fill: #FFF;
-}
-
 svg path{
     fill: #FFF;
 }

@@ -1,144 +1,145 @@
-<div class="title">
-    <h1>Crypto Portfolio</h1> <button class="updatePrices" hx-get="/crypto/fetch/prices" hx-target="#content"
-        hx-swap="innerHTML">Fetch New Prices</button>
-</div>
-
-<section class="cards">
-    <div class="card">
-        <div class="cardHead">
-            <h3 class="">Current Value</h3>
-            <span>
-                
-                <svg xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2" class="h-4 w-4 text-muted-foreground">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-            </span>
-        </div>
-        <footer class="">
-            <div class="text-2xl">R {{ formatPrice .TotalValue }}</div>
-            <p class="muted"><small>{{.TotalValuePercentChange}}% from last fetch</small></p>
-        </footer>
+<div>
+    <div class="title">
+        <h1>Crypto Portfolio</h1> <button class="updatePrices" hx-get="/crypto/fetch/prices" hx-target="#content"
+            hx-swap="innerHTML">Fetch New Prices</button>
     </div>
-    <div class="card ">
-        <div class=" cardHead">
-            <h3 class="">Previous Value</h3>
-            <span>
-                <svg xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2" class="h-4 w-4 text-muted-foreground">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-            </span>
-        </div>
-        <footer class="">
-            <div class="text-2xl">R {{ formatPrice .PrevTotalValue }}</div>
-            <p class="muted"><small>{{.PrevTotalValuePercentChange}}% from last fetch</small></p>
-        </footer>
-    </div>
-    <div class=" card ">
-        <div class="cardHead">
-            <h3 class="">Best Performing Coin</h3>
-            <span>
-                <svg xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2" class="h-4 w-4 text-muted-foreground">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-            </span>
-        </div>
-        <footer class="">
-            <div class="text-2xl">
-                R {{ formatPrice .BestPerformingCoinPrice }} &bullet; {{ .BestPerformingCoin.CryptoCoin.CryptoName }}
+    
+    <section class="cards">
+        <div class="card">
+            <div class="cardHead">
+                <h3 class="">Current Value</h3>
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                </span>
             </div>
-            <p class="muted">
-                <small>
-                    {{ .BestPerformingCoinPercent }}% percent change since last update
-                </small>
-            </p>
-        </footer>
-    </div>
-    <div class=" card ">
-        <div class=" cardHead">
-            <h3 class="">Total Savings</h3>
-            <span>
-                + 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2" class="h-4 w-4 text-muted-foreground">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-            </svg>
-            </span>
+            <footer class="">
+                <div class="text-2xl">R {{ formatPrice .TotalValue }}</div>
+                <p class="muted"><small>{{.TotalValuePercentChange}}% from last fetch</small></p>
+            </footer>
         </div>
-        <footer class="">
-            <div class="text-2xl">R 200 000</div>
-            <p class="muted"><small>+201 since last hour</small></p>
-        </footer>
-    </div>
-</section>
-
-<section id="transTypeList" class="dashboardContainer">
-    <div class="recentTransactions border">
-        <h3>
-            Crypto We Own
-            <!-- <small class="muted">More info text here</small> -->
-        </h3>
-        <ul>
-            {{ range .CoinData }}
-            <li>
-                <span class="flex">
-                    <h5 class="uppercase">
-
-                        {{ .Coin.CryptoName }} &nbsp;
-                        <span 
-                        {{if gt .PercentChange 0.0 }}
-                            class="percentChange success"
-                        {{else}}
-                            class="percentChange danger" 
-                        {{end}}
-                    >
-                        {{ .PercentChange }} %
-                    </span>
-                        <small class="muted">
-                            {{ .Coin.CryptoSymbol }}
-                            {{if and .Coin.CryptoPrice}}&bullet; $ {{formatPrice .Coin.CryptoPrice}}{{end}}
-                            {{if and .Coin.CryptoPriceZar}}&bullet; R {{formatPrice .Coin.CryptoPriceZar}}{{end}}
-                        </small>
-                    </h5>
+        <div class="card ">
+            <div class=" cardHead">
+                <h3 class="">Previous Value</h3>
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
                 </span>
-                <span class="alignRight">
-                    R   {{if and .Coin.CurrentValueZar}}
-                            {{ formatPrice .Coin.CurrentValueZar }}
-                        {{else}}
-                            0
-                        {{end}}
-                    <small class="muted">
-                        {{ formatPrice .Coin.CryptoAmountHolding}}
+            </div>
+            <footer class="">
+                <div class="text-2xl">R {{ formatPrice .PrevTotalValue }}</div>
+                <p class="muted"><small>{{.PrevTotalValuePercentChange}}% from last fetch</small></p>
+            </footer>
+        </div>
+        <div class=" card ">
+            <div class="cardHead">
+                <h3 class="">Best Performing Coin</h3>
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                </span>
+            </div>
+            <footer class="">
+                <div class="text-2xl">
+                    R {{ formatPrice .BestPerformingCoinPrice }} &bullet; {{ .BestPerformingCoin.CryptoCoin.CryptoName }}
+                </div>
+                <p class="muted">
+                    <small>
+                        {{ .BestPerformingCoinPercent }}% percent change since last update
                     </small>
+                </p>
+            </footer>
+        </div>
+        <div class=" card ">
+            <div class=" cardHead">
+                <h3 class="">Total Savings</h3>
+                <span>
+                    + 
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
                 </span>
-            </li>
-            {{ end }}
-        </ul>
-    </div>
-</section>
-
-
-    <!-- <div class="monthlyBudget border">
-        <h3>
-            Add/View Transaction Type
-            <small class="muted">Some text can go here...</small>
-        </h3>
-        <section id="addBudget"></section>
-        <form hx-post="/crypto/add" hx-target="#content" hx-swap="innerHTML">
-            <label for="geckoid">Gecko ID:</label>
-            <input type="text" id="geckoid" name="geckoid" required>
-            <label for="cryptoname">Crypto Name:</label>
-            <input type="text" id="cryptoname" name="cryptoname" required>
-            <label for="cryptosymbol">Crypto Symbol:</label>
-            <input type="text" id="cryptosymbol" name="cryptosymbol" required>
-            <label for="amount">Holding:</label>
-            <input type="number" id="amount" name="amount" step="0.0000000001" required>
-            <button type="submit">Add</button>
-        </form>
-    </div> -->
+            </div>
+            <footer class="">
+                <div class="text-2xl">R 200 000</div>
+                <p class="muted"><small>+201 since last hour</small></p>
+            </footer>
+        </div>
+    </section>
+    
+    <section id="transTypeList" class="dashboardContainer">
+        <div class="recentTransactions border">
+            <h3>
+                Crypto We Own
+                <!-- <small class="muted">More info text here</small> -->
+            </h3>
+            <ul>
+                {{ range .CoinData }}
+                <li>
+                    <span class="flex">
+                        <h5 class="uppercase">
+    
+                            {{ .Coin.CryptoName }} &nbsp;
+                            <span 
+                            {{if gt .PercentChange 0.0 }}
+                                class="percentChange success"
+                            {{else}}
+                                class="percentChange danger" 
+                            {{end}}
+                        >
+                            {{ .PercentChange }} %
+                        </span>
+                            <small class="muted">
+                                {{ .Coin.CryptoSymbol }}
+                                {{if and .Coin.CryptoPrice}}&bullet; $ {{formatPrice .Coin.CryptoPrice}}{{end}}
+                                {{if and .Coin.CryptoPriceZar}}&bullet; R {{formatPrice .Coin.CryptoPriceZar}}{{end}}
+                            </small>
+                        </h5>
+                    </span>
+                    <span class="alignRight">
+                        R   {{if and .Coin.CurrentValueZar}}
+                                {{ formatPrice .Coin.CurrentValueZar }}
+                            {{else}}
+                                0
+                            {{end}}
+                        <small class="muted">
+                            {{ formatPrice .Coin.CryptoAmountHolding}}
+                        </small>
+                    </span>
+                </li>
+                {{ end }}
+            </ul>
+        </div>
+    </section>
+    
+    
+        <!-- <div class="monthlyBudget border">
+            <h3>
+                Add/View Transaction Type
+                <small class="muted">Some text can go here...</small>
+            </h3>
+            <section id="addBudget"></section>
+            <form hx-post="/crypto/add" hx-target="#content" hx-swap="innerHTML">
+                <label for="geckoid">Gecko ID:</label>
+                <input type="text" id="geckoid" name="geckoid" required>
+                <label for="cryptoname">Crypto Name:</label>
+                <input type="text" id="cryptoname" name="cryptoname" required>
+                <label for="cryptosymbol">Crypto Symbol:</label>
+                <input type="text" id="cryptosymbol" name="cryptosymbol" required>
+                <label for="amount">Holding:</label>
+                <input type="number" id="amount" name="amount" step="0.0000000001" required>
+                <button type="submit">Add</button>
+            </form>
+        </div> -->
+</div>
