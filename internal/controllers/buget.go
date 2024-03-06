@@ -36,6 +36,39 @@ func (ge *GinEngine) SaveBudgetItem(c *gin.Context) {
 	c.JSON(http.StatusOK, budget)
 }
 
+func (ge *GinEngine) UpdateBudgetItem(c *gin.Context) {
+	var budget *models.Budget
+
+	budgetID := c.Param("id")
+	name := c.PostForm("name")
+	amountStr := c.PostForm("amount")
+
+	// Convert amount to float64
+	amount, err := strconv.ParseFloat(amountStr, 64)
+	if err != nil {
+		ge.ReturnErrorJSON(c, err)
+		return
+	}
+
+	// Find the budget item
+	result := ge.db().First(&budget, utils.StringToUint(budgetID))
+	if result.Error != nil {
+		ge.ReturnErrorJSON(c, result.Error)
+		return
+	}
+
+	// Update the budget item
+	budget.Name = name
+	budget.Amount = amount
+	response := ge.db().Model(&budget).Updates(budget).Scan(&budget)
+	if response.Error != nil {
+		ge.ReturnErrorJSON(c, response.Error)
+		return
+	}
+
+	ge.HandleTransctions(c)
+}
+
 func (ge *GinEngine) BudgetTransactionAdd(c *gin.Context) {
 
 	transactionID := c.Param("id")
@@ -63,5 +96,23 @@ func (ge *GinEngine) ReturnBudgetForm(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "budgetform.html", gin.H{
 		"Version": "1",
+	})
+}
+
+func (ge *GinEngine) ReturnBudgetEditForm(c *gin.Context) {
+	// single file
+	r := ge.Router
+	r.LoadHTMLFiles(BudgetEdit)
+	budgetID := c.Param("id")
+
+	var budget models.Budget
+	response := ge.db().First(&budget, budgetID)
+	if response.Error != nil {
+		ge.ReturnErrorPage(c, response.Error)
+		return
+	}
+
+	c.HTML(http.StatusOK, "budgetedit.html", gin.H{
+		"Budget": budget,
 	})
 }

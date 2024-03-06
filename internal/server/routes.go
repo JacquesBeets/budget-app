@@ -51,7 +51,6 @@ func HandleViews(r *gin.Engine) {
 	r.GET("templates/upload", views.UploadPage)
 	r.GET("/upload", views.UploadPage)
 
-	r.GET("templates/dashboard", views.Dashboard)
 	r.GET("templates/transactions", views.ReturnTransactions)
 	r.GET("templates/transactionstypes", views.ReturnTransactionTypes)
 	r.GET("templates/crypto", views.ReturnCryptoView)
@@ -64,11 +63,13 @@ func HandleComponents(r *gin.Engine) {
 	r.GET("components/transactions", views.HandleTransctions)
 	r.GET("transactions/download", views.DownloadTransactions)
 	r.GET("components/budget/form", views.ReturnBudgetForm)
+	r.GET("components/budget/:id/edit", views.ReturnBudgetEditForm)
 	r.GET("/crypto/fetch/prices", views.FetchCurrentCrypoPrices)
 
 	// Posts
 	r.POST("/upload/ofx", views.HandleOFXUpload)
 	r.POST("/budget/add", views.SaveBudgetItem)
+	r.POST("/budget/edit/:id", views.UpdateBudgetItem)
 	r.POST("/transactionstypes/add", views.HandleTransactionTypeCreate)
 	r.POST("/transactions/:id/transactionstypes/add", views.TransactionsAddTransactionType)
 	r.POST("/transactions/:id/budgetitems/add", views.BudgetTransactionAdd)

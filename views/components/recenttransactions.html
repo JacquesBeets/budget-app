@@ -1,145 +1,161 @@
-<section class="cards">
-    <div class="card">
-        <div class="cardHead">
-            <h3 class="">Total Income</h3>
-            <span>
-                +
-                <svg xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2" class="h-4 w-4 text-muted-foreground">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-            </span>
-        </div>
-        <footer class="">
-            <div class="text-2xl">R {{ formatPrice .TotalIncome }}</div>
-            <p class="muted"><small>+20.1% from last month</small></p>
-        </footer>
+<div class="title">
+    <h1>Dashboard</h1>
+    <div class="custom-month-input">
+        <input type="month" name="date" id="date" hx-get="/components/transactions" hx-trigger="change" hx-target="#content" hx-swap="innerHTML">
+        <div class="icon">&#x1F4C5;</div>
     </div>
-    <div class="card ">
-        <div class=" cardHead">
-            <h3 class="">Total Spent</h3>
-            <span>
-                -
-                <svg xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2" class="h-4 w-4 text-muted-foreground">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-            </span>
-        </div>
-        <footer class="">
-            <div class="text-2xl">R {{ formatPrice .TotalExpense }}</div>
-            <p class="muted"><small>+180.1% from last month</small></p>
-        </footer>
-    </div>
-    <div class=" card ">
-        <div class="cardHead">
-            <h3 class="">Budget</h3>
-            <span>
-                -
-                <svg xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2" class="h-4 w-4 text-muted-foreground">
-                <rect width="20" height="14" x="2" y="5" rx="2"></rect>
-                <path d="M2 10h20"></path>
-            </svg>
-            </span>
-        </div>
-        <footer class="">
-            <div class="text-2xl">R {{ formatPrice .BudgetTotal }}</div>
-            <p class="muted"><small>Current budget spend is: R {{ formatPrice .BudgetSpent }}</small></p>
-        </footer>
-    </div>
-    <div class=" card ">
-        <div class=" cardHead">
-            <h3 class="">Total Savings</h3>
-            <span>
-                + 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2" class="h-4 w-4 text-muted-foreground">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-            </svg>
-            </span>
-        </div>
-        <footer class="">
-            <div class="text-2xl">R 200 000</div>
-            <p class="muted"><small>+201 since last hour</small></p>
-        </footer>
-    </div>
-</section>
+</div>
 
 
-<section class="dashboardContainer">
-    <div class="recentTransactions border">
-        <h3>
-            Recent Transactions
-            <small class="muted">The recent stransaction total is R {{ formatPrice .RecentTotal }} out of {{
-                .TransactionCount
-                }}</small>
-        </h3>
-    
-        <ul>
-            {{ range .Transactions }}
-            <li>
-                <span class="flex">
-                    <span class="profilePic">
-                        {{if eq .BankName "FNB"}}
-                        <img src="/static/img/fnb.png" alt="FNB">
-                        {{else}}
-                        <img src="/static/img/nedbank.png" alt="NEDBANK">
-                        {{end}}
-                    </span>
-                    <h5 class="uppercase">
-                        {{if isEmpty .TransactionMemo }}
-                            {{.TransactionName}}
-                        {{else}}
-                            {{.TransactionMemo}}
-                        {{end}}
-                        {{if and .TransactionType .Budget}}
-                        <small class="muted">{{if and .TransactionType}}{{ .TransactionType.Title }}{{end}} {{if and .Budget}}&bullet; {{ .Budget.Name }} {{end}}</small>
-                        {{else}}
-                        <small class="muted">{{if and .TransactionType}}{{ .TransactionType.Title }}{{end}} {{if and .Budget }}{{ .Budget.Name }} {{end}}</small>
-                        {{end}}
-                    </h5>
+<div>
+    <section class="cards">
+        <div class="card">
+            <div class="cardHead">
+                <h3 class="">Total Income</h3>
+                <span>
+                    +
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
                 </span>
-                <span class="alignRight">
-                    R {{ formatPrice .TransactionAmount }}
-                    <small class="muted">{{ formatDate .TransactionDate}}</small>
+            </div>
+            <footer class="">
+                <div class="text-2xl">R {{ formatPrice .TotalIncome }}</div>
+                <p class="muted"><small>+20.1% from last month</small></p>
+            </footer>
+        </div>
+        <div class="card ">
+            <div class=" cardHead">
+                <h3 class="">Total Spent</h3>
+                <span>
+                    -
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
                 </span>
-            </li>
-            {{ end }}
-        </ul>
-    </div>
+            </div>
+            <footer class="">
+                <div class="text-2xl">R {{ formatPrice .TotalExpense }}</div>
+                <p class="muted"><small>+180.1% from last month</small></p>
+            </footer>
+        </div>
+        <div class=" card ">
+            <div class="cardHead">
+                <h3 class="">Budget</h3>
+                <span>
+                    -
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                    <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+                    <path d="M2 10h20"></path>
+                </svg>
+                </span>
+            </div>
+            <footer class="">
+                <div class="text-2xl">R {{ formatPrice .BudgetTotal }}</div>
+                <p class="muted"><small>Current budget spend is: R {{ formatPrice .BudgetSpent }}</small></p>
+            </footer>
+        </div>
+        <div class=" card ">
+            <div class=" cardHead">
+                <h3 class="">Total Savings</h3>
+                <span>
+                    + 
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" class="h-4 w-4 text-muted-foreground">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+                </span>
+            </div>
+            <footer class="">
+                <div class="text-2xl">R 200 000</div>
+                <p class="muted"><small>+201 since last hour</small></p>
+            </footer>
+        </div>
+    </section>
     
-    <div class="monthlyBudget border">
-        <header class="flex">
+    
+    <section class="dashboardContainer">
+        <div class="recentTransactions border">
             <h3>
-                Monthly Budget
-                <small class="muted">The recent stransaction total is R {{ formatPrice .BudgetSpent }}</small>
+                Recent Transactions
+                <small class="muted">The recent stransaction total is R {{ formatPrice .RecentTotal }} out of {{
+                    .TransactionCount
+                    }}</small>
             </h3>
-            <button hx-get="/components/budget/form" hx-trigger="click" hx-target="#addBudget" hx-swap="innerHTML" class="ml-auto">+ Add</button>
-        </header>
-        <section id="addBudget"></section>
-        <ul>
-            {{ range .BudgetTotalItems }}
-            <li class="borderBottom">
-                <h5>
-                    {{ .Budget.Name }}
-                    <small class="muted">More info here</small>
-                </h5>
-                <span class="alignRight ml-auto">
-                    R {{ formatPrice .Budget.Amount }}
+        
+            <ul>
+                {{ range .Transactions }}
+                <li>
+                    <span class="flex">
+                        <span class="profilePic">
+                            {{if eq .BankName "FNB"}}
+                            <img src="/static/img/fnb.png" alt="FNB">
+                            {{else}}
+                            <img src="/static/img/nedbank.png" alt="NEDBANK">
+                            {{end}}
+                        </span>
+                        <h5 class="uppercase">
+                            {{if isEmpty .TransactionMemo }}
+                                {{.TransactionName}}
+                            {{else}}
+                                {{.TransactionMemo}}
+                            {{end}}
+                            {{if and .TransactionType .Budget}}
+                            <small class="muted">{{if and .TransactionType}}{{ .TransactionType.Title }}{{end}} {{if and .Budget}}&bullet; {{ .Budget.Name }} {{end}}</small>
+                            {{else}}
+                            <small class="muted">{{if and .TransactionType}}{{ .TransactionType.Title }}{{end}} {{if and .Budget }}{{ .Budget.Name }} {{end}}</small>
+                            {{end}}
+                        </h5>
+                    </span>
+                    <span class="alignRight">
+                        R {{ formatPrice .TransactionAmount }}
+                        <small class="muted">{{ formatDate .TransactionDate}}</small>
+                    </span>
+                </li>
+                {{ end }}
+            </ul>
+        </div>
+        
+        <div class="monthlyBudget border">
+            <header class="flex">
+                <h3>
+                    Monthly Budget
+                    <small class="muted">The recent stransaction total is R {{ formatPrice .BudgetSpent }}</small>
+                </h3>
+                <button hx-get="/components/budget/form" hx-trigger="click" hx-target="#addBudget" hx-swap="innerHTML" class="ml-auto">+ Add</button>
+            </header>
+            <section id="addBudget"></section>
+            <ul>
+                {{ range .BudgetTotalItems }}
+                <li class="borderBottom">
+                    <h5>
+                        <a hx-get="/components/budget/{{.Budget.ID}}/edit" hx-trigger="click" hx-target="#addBudget" hx-swap="innerHTML">{{ .Budget.Name }}</a>
+                        <small class="muted">More info here</small>
+                    </h5>
+                    <span class="alignRight ml-auto">
+                        R {{ formatPrice .Budget.Amount }}
+    
+                        {{ if isTotalSpendGreaterThanBudget .TotalTransactionAmount .Budget.Amount }}
+                        <small class="danger">R {{ formatPrice .TotalTransactionAmount}}</small>
+                        {{ else }}
+                        <small class="success">R {{ formatPrice .TotalTransactionAmount}}</small>
+                        {{ end }}
+                    </span>
+                </li>
+                {{ end }}
+            </ul>
+        </div>
+    </section> 
+    
+</div>
 
-                    {{ if isTotalSpendGreaterThanBudget .TotalTransactionAmount .Budget.Amount }}
-                    <small class="danger">R {{ formatPrice .TotalTransactionAmount}}</small>
-                    {{ else }}
-                    <small class="success">R {{ formatPrice .TotalTransactionAmount}}</small>
-                    {{ end }}
-                </span>
-            </li>
-            {{ end }}
-        </ul>
-    </div>
-</section> 
+<script>
+    document.querySelector('#date').value = new Date().toISOString().slice(0, 7);
+</script>

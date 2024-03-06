@@ -108,6 +108,11 @@ func CleanUpDownloads() error {
 	return nil
 }
 
+func StartDownload() {
+	DownloadFnb()
+	DownloadNed()
+}
+
 func DownloadNed() error {
 	usern := os.Getenv("USERN")
 	pass := os.Getenv("PASSWORD")
@@ -349,8 +354,8 @@ func DownloadFnb() error {
 	assertErrorToNilf("could not parse OFX: %w", err)
 
 	// Clean Up
-	err = CleanUpDownloads()
-	assertErrorToNilf("could not clean up: %w", err)
+	// err = CleanUpDownloads()
+	// assertErrorToNilf("could not clean up: %w", err)
 
 	log.Println("Completed FNB Download")
 	return nil

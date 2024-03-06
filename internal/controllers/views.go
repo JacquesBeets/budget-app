@@ -26,6 +26,7 @@ const (
 const (
 	RecentTransactionComponent = "./views/components/recenttransactions.html"
 	BudgetForm                 = "./views/components/budgetform.html"
+	BudgetEdit                 = "./views/components/budgetedit.html"
 )
 
 const (
@@ -68,15 +69,15 @@ func (ge *GinEngine) HomePage(c *gin.Context) {
 	})
 }
 
-func (ge *GinEngine) Dashboard(c *gin.Context) {
-	r := ge.Router
+// func (ge *GinEngine) Dashboard(c *gin.Context) {
+// 	r := ge.Router
 
-	r.LoadHTMLFiles(DashboardHTML)
+// 	r.LoadHTMLFiles(DashboardHTML)
 
-	c.HTML(http.StatusOK, "dashboard.html", gin.H{
-		"Now": time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
-	})
-}
+// 	c.HTML(http.StatusOK, "dashboard.html", gin.H{
+// 		"Now": time.Date(2017, 0o7, 0o1, 0, 0, 0, 0, time.UTC),
+// 	})
+// }
 
 func (ge *GinEngine) UploadPage(c *gin.Context) {
 	r := ge.Router
@@ -102,10 +103,7 @@ func (ge *GinEngine) UploadPageRefreshed(c *gin.Context) {
 }
 
 func (ge *GinEngine) DownloadTransactions(c *gin.Context) {
-
-	go DownloadFnb()
-	go DownloadNed()
-
+	go StartDownload()
 	ge.ReturnTransactions(c)
 }
 
@@ -118,7 +116,6 @@ type UniqueFields struct {
 }
 
 func (ge *GinEngine) RemoveDuplicateTransactions(c *gin.Context) {
-	// r := ge.Router
 	db := ge.db()
 
 	var uniqueTransactions []UniqueFields

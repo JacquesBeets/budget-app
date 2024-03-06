@@ -14,7 +14,7 @@
   <!-- <h1>{{ .Version }}</h1> -->
   {{template "sidenav.html" .Version}}
 
-  <div id="content" class="container mx-auto" hx-get="/templates/dashboard" hx-trigger="load"></div>
+  <div id="content" class="container mx-auto" hx-get="/components/transactions" hx-trigger="load"></div>
 
   {{template "bodyimports.html" .Version}}
 </body>
