@@ -75,4 +75,7 @@ func HandleComponents(r *gin.Engine) {
 	r.POST("/transactions/:id/budgetitems/add", views.BudgetTransactionAdd)
 	r.POST("/transactions/duplicate/remove", views.RemoveDuplicateTransactions)
 	r.POST("/crypto/add", views.SaveCryptoCoin)
+
+	// Modals
+	r.GET("/crypto/add/:id", views.ReturnCryptoModal)
 }

@@ -83,6 +83,17 @@
             <h3>
                 Crypto We Own
                 <!-- <small class="muted">More info text here</small> -->
+                <span>
+                    <button 
+                        hx-get="/crypto/add/new" 
+                        hx-trigger="click" 
+                        hx-target="#cryptoAddEditModal" 
+                        hx-swap="innerHTML"
+                        _="on htmx:afterOnLoad wait 1ms then add .modal-open to #cryptoAddEditModal"
+                        >
+                        Add Crypto
+                    </button>
+                </span>
             </h3>
             <ul>
                 {{ range .CoinData }}
@@ -121,7 +132,7 @@
                 {{ end }}
             </ul>
         </div>
-<!--             
+        
         <div class="monthlyBudget border">
             <h3>
                 Crypto Porfolio Chart
@@ -130,29 +141,11 @@
             <div>
                 <iframe id="addBudget" src="/templates/linechart"  onload="this.style.height=this.contentDocument.body.scrollHeight +'px';" width="100%"></iframe>
             </div>
-        </div> -->
-        <div class="monthlyBudget border">
-            <h3>
-                Add/View Transaction Type
-                <small class="muted">Some text can go here...</small>
-            </h3>
-            <section id="addBudget"></section>
-            <form hx-post="/crypto/add" hx-target="#content" hx-swap="innerHTML">
-                <label for="geckoid">Gecko ID:</label>
-                <input type="text" id="geckoid" name="geckoid" required>
-                <label for="cryptoname">Crypto Name:</label>
-                <input type="text" id="cryptoname" name="cryptoname" required>
-                <label for="cryptosymbol">Crypto Symbol:</label>
-                <input type="text" id="cryptosymbol" name="cryptosymbol" required>
-                <label for="amount">Holding:</label>
-                <input type="number" id="amount" name="amount" step="0.0000000001" required>
-                <button type="submit">Add</button>
-            </form>
         </div>
+
     </section>
-    
+        
 
-
-
+    <div id="cryptoAddEditModal" class="modal"></div>
 
 </div>

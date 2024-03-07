@@ -27,6 +27,7 @@ const (
 	RecentTransactionComponent = "./views/components/recenttransactions.html"
 	BudgetForm                 = "./views/components/budgetform.html"
 	BudgetEdit                 = "./views/components/budgetedit.html"
+	CryptoModal                = "./views/modals/cryptomodal.html"
 )
 
 const (

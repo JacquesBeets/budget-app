@@ -148,3 +148,34 @@ func (ge *GinEngine) SaveCryptoCoin(c *gin.Context) {
 
 	ReturnAllCoinsView(ge, c)
 }
+
+func (ge *GinEngine) ReturnCryptoModal(c *gin.Context) {
+	r := ge.Router
+	r.LoadHTMLFiles(CryptoModal)
+
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		ge.ReturnErrorJSON(c, err)
+	}
+	
+
+	if idStr == "new" {
+		c.HTML(http.StatusOK, "cryptomodal.html", gin.H{})
+		return
+	}
+
+	coin := models.CryptoCoin{}
+	coin.ID = uint(id)
+
+	response := coin.FetchByID(ge.db(), uint(id))
+	if response.Error != nil {
+		ge.ReturnErrorJSON(c, response.Error)
+		return
+	}
+
+	c.HTML(http.StatusOK, "cryptomodal.html", gin.H{
+		"Coin": coin,
+	})
+
+}

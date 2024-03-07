@@ -126,7 +126,7 @@ func (c *CryptoCoin) Create(tx *gorm.DB) (*gorm.DB, error) {
 }
 
 func (c *CryptoCoin) FetchByID(tx *gorm.DB, id uint) *gorm.DB {
-	return tx.Where("id = ?", id)
+	return tx.First(&c, id)
 }
 
 func (c *CryptoCoin) Update(tx *gorm.DB, id uint) *gorm.DB {
