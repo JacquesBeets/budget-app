@@ -119,6 +119,10 @@ small {
     border-bottom: 1px solid #333;
 }
 
+.pointer {
+    cursor: pointer;
+}
+
 nav.sideNav {
     border-right: 1px solid #333;
     flex: 0 0 11%;

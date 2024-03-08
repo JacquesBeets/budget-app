@@ -130,7 +130,7 @@ func (c *CryptoCoin) FetchByID(tx *gorm.DB, id uint) *gorm.DB {
 }
 
 func (c *CryptoCoin) Update(tx *gorm.DB, id uint) *gorm.DB {
-	return tx.Save(c)
+	return tx.Model(&c).Where("id = ?", id).Updates(&c)
 }
 
 func (c *CryptoCoin) Delete(tx *gorm.DB, id uint) *gorm.DB {

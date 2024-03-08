@@ -154,14 +154,14 @@ func (ge *GinEngine) ReturnCryptoModal(c *gin.Context) {
 	r.LoadHTMLFiles(CryptoModal)
 
 	idStr := c.Param("id")
+	if idStr == "new" {
+		c.HTML(http.StatusOK, "cryptomodal.html", gin.H{})
+		return
+	}
+
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
 		ge.ReturnErrorJSON(c, err)
-	}
-	
-
-	if idStr == "new" {
-		c.HTML(http.StatusOK, "cryptomodal.html", gin.H{})
 		return
 	}
 
@@ -178,4 +178,41 @@ func (ge *GinEngine) ReturnCryptoModal(c *gin.Context) {
 		"Coin": coin,
 	})
 
+}
+
+func (ge *GinEngine) UpdateCryptoCoin(c *gin.Context) {
+	var crypto *models.CryptoCoin
+
+	coinID := c.PostForm("geckoid")
+	coinName := c.PostForm("cryptoname")
+	coinSymbol := c.PostForm("cryptosymbol")
+	coinAmount := c.PostForm("amount")
+
+	// Convert amount to float64
+	amount, err := strconv.ParseFloat(coinAmount, 64)
+	if err != nil {
+		ge.ReturnErrorJSON(c, err)
+		return
+	}
+
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		ge.ReturnErrorJSON(c, err)
+		return
+	}
+
+	newCoin, err := crypto.New(coinID, coinName, coinSymbol, amount)
+	if err != nil {
+		ge.ReturnErrorJSON(c, err)
+		return
+	}
+
+	response := newCoin.Update(ge.db(), uint(id))
+	if response.Error != nil {
+		ge.ReturnErrorJSON(c, response.Error)
+		return
+	}
+
+	ReturnAllCoinsView(ge, c)
 }

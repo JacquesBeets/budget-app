@@ -99,10 +99,16 @@
                 {{ range .CoinData }}
                 <li>
                     <span class="flex">
-                        <h5 class="uppercase">
+                        <h5 class="uppercase pointer" 
+                            hx-get="/crypto/add/{{ .Coin.ID }}" 
+                            hx-trigger="click" 
+                            hx-target="#cryptoAddEditModal" 
+                            hx-swap="innerHTML"
+                            _="on htmx:afterOnLoad wait 1ms then add .modal-open to #cryptoAddEditModal"
+                        >
     
                             {{ .Coin.CryptoName }} &nbsp;
-                            <span 
+                        <span 
                             {{if gt .PercentChange 0.0 }}
                                 class="percentChange success"
                             {{else}}
