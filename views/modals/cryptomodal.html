@@ -1,49 +1,53 @@
 {{ if .Coin }}
 
-    <div class="modalBody">
-        <h3>
+    <div class="modalBody border">
+        <h3 class="flex borderBottom pb-1 mb-1">
             Edit Transaction Type
-            <button type="button" class="close" _="on click remove .modal-open from #cryptoAddEditModal">&times;</button>
+            <button type="button" class="close ml-auto" _="on click remove .modal-open from #cryptoAddEditModal">&times;</button>
         </h3>
-        <form hx-patch="/crypto/update/{{ .Coin.ID }}" hx-target="#content" hx-swap="innerHTML">
-            <label for="geckoid">Gecko ID:</label>
-            <input type="text" id="geckoid" name="geckoid" value="{{ .Coin.CoinGeckoCryptoID }}" required>
+        <form class="p-1" hx-patch="/crypto/update/{{ .Coin.ID }}" hx-target="#content" hx-swap="innerHTML">
+            <label for="geckoid">Gecko ID</label>
+            <input class="mb-1" type="text" id="geckoid" name="geckoid" value="{{ .Coin.CoinGeckoCryptoID }}" required>
 
-            <label for="cryptoname">Crypto Name:</label>
-            <input type="text" id="cryptoname" name="cryptoname" value="{{ .Coin.CryptoName }}" required>
+            <label for="cryptoname">Crypto Name</label>
+            <input  class="mb-1" type="text" id="cryptoname" name="cryptoname" value="{{ .Coin.CryptoName }}" required>
 
-            <label for="cryptosymbol">Crypto Symbol:</label>
-            <input type="text" id="cryptosymbol" name="cryptosymbol" value="{{ .Coin.CryptoSymbol }}" required>
+            <label for="cryptosymbol">Crypto Symbol</label>
+            <input  class="mb-1" type="text" id="cryptosymbol" name="cryptosymbol" value="{{ .Coin.CryptoSymbol }}" required>
 
-            <label for="amount">Holding:</label>
-            <input type="number" id="amount" name="amount" value="{{ .Coin.CryptoAmountHolding }}" step="0.0000000001" required>
+            <label for="amount">Holding</label>
+            <input class="mb-2" type="number" id="amount" name="amount" value="{{ .Coin.CryptoAmountHolding }}" step="0.0000000001" required>
            
-            <button type="submit" _="on htmx:afterOnLoad wait 1ms then remove .modal-open from #cryptoAddEditModal">Update</button>
+            <span>
+                <button class="w-100" type="submit" _="on htmx:afterOnLoad wait 1ms then remove .modal-open from #cryptoAddEditModal">Update</button>
+            </span>
         </form>
     </div>
 
 {{ else }}
 
-<div class="modalBody">
-    <h3>
+<div class="modalBody border">
+    <h3 class="flex borderBottom pb-1 mb-1">
         Add Transaction Type
-        <button type="button" class="close" _="on click remove .modal-open from #cryptoAddEditModal">&times;</button>
+        <button type="button" class="close ml-auto" _="on click remove .modal-open from #cryptoAddEditModal">&times;</button>
     </h3>
-    <form hx-post="/crypto/add" hx-target="#content" hx-swap="innerHTML">
+    <form class="p-1" hx-post="/crypto/add" hx-target="#content" hx-swap="innerHTML">
 
-        <label for="geckoid">Gecko ID:</label>
-        <input type="text" id="geckoid" name="geckoid" required>
+        <label for="geckoid">Gecko ID</label>
+        <input  class="mb-1" type="text" id="geckoid" name="geckoid" required>
 
-        <label for="cryptoname">Crypto Name:</label>
-        <input type="text" id="cryptoname" name="cryptoname" required>
+        <label for="cryptoname">Crypto Name</label>
+        <input  class="mb-1" type="text" id="cryptoname" name="cryptoname" required>
 
-        <label for="cryptosymbol">Crypto Symbol:</label>
-        <input type="text" id="cryptosymbol" name="cryptosymbol" required>
+        <label for="cryptosymbol">Crypto Symbol</label>
+        <input  class="mb-1" type="text" id="cryptosymbol" name="cryptosymbol" required>
 
-        <label for="amount">Holding:</label>
-        <input type="number" id="amount" name="amount" step="0.0000000001" required>
+        <label for="amount">Holding</label>
+        <input  class="mb-2" type="number" id="amount" name="amount" step="0.0000000001" required>
 
-        <button type="submit">Add</button>
+        <span>
+            <button class="w-100" type="submit" _="on htmx:afterOnLoad wait 1ms then remove .modal-open from #cryptoAddEditModal">Add</button>
+        </span>
     </form>
 </div>
 
