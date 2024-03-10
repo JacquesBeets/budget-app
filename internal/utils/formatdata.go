@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"html/template"
 	"math"
 	"reflect"
 	"strconv"
@@ -80,8 +81,16 @@ func FormatPrice(p float64) string {
 	return integerPart + "." + parts[1]
 }
 
+func FormatNumberToTwoDecimalPlaces(n float64) float64 {
+	return math.Round(n*100) / 100
+}
+
 func CalculatePercentageChange(old float64, new float64) float64 {
 	percentageChange := (new - old) / old * 100
 	formattedPercentageChange := math.Round(percentageChange*100) / 100
 	return formattedPercentageChange
+}
+
+func SafeJS(s interface{}) template.JS {
+	return template.JS(fmt.Sprint(s))
 }

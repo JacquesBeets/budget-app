@@ -147,6 +147,12 @@ small {
     border-bottom: 1px solid #333;
 }
 
+.noWrap {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 .pointer {
     cursor: pointer;
 }
@@ -170,7 +176,7 @@ img {
 #content {
     flex: 0 0 89%;
     overflow: hidden;
-    /* overflow-y: auto; */
+    height: 100vh;
 }
 
 ul{
@@ -457,4 +463,9 @@ svg path{
     border-radius: 0.5rem;
     max-width: 500px;
     width: 100%;
+}
+
+#cryptoPortfolioChart{
+    padding: 0;
+    height: 100%;
 }

@@ -87,6 +87,7 @@ func ReturnAllCoinsView(ge *GinEngine, c *gin.Context) {
 func (ge *GinEngine) FetchCurrentCrypoPrices(c *gin.Context) {
 	cryptoCoins := models.CryptoCoins{}
 	cryptoHistories := models.CryptoPortfolioHistories{}
+	cryptoHistoryTotal := models.CryptoPortfolioTotalHistory{}
 
 	_, err := cryptoCoins.FetchAll(ge.db())
 	if err != nil {
@@ -107,6 +108,13 @@ func (ge *GinEngine) FetchCurrentCrypoPrices(c *gin.Context) {
 	}
 
 	_, err = newHistories.Save(ge.db())
+	if err != nil {
+		ge.ReturnErrorJSON(c, err)
+		return
+	}
+
+	currentTotals := cryptoCoins.ReturnPortfolioTotal(ge.db())
+	_, err = cryptoHistoryTotal.Create(ge.db(), currentTotals)
 	if err != nil {
 		ge.ReturnErrorJSON(c, err)
 		return

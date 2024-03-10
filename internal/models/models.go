@@ -9,4 +9,5 @@ var RegisteredModels = []interface{}{
 	&BudgetTransaction{},
 	&CryptoCoin{},
 	&CryptoPortfolioHistory{},
+	&CryptoPortfolioTotalHistory{},
 }

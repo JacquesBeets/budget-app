@@ -15,6 +15,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
 	GinEngineVar = r
 
+	// r.LoadHTMLGlob("views/**/**/*") // TODO: This is not working
+
 	funcMap := template.FuncMap{
 		"formatDate":                    utils.FormatDate,
 		"formatPrice":                   utils.FormatPrice,
@@ -22,6 +24,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		"isNil":                         utils.IsNil,
 		"isTotalSpendGreaterThanBudget": utils.IsTotalSpendGreaterThanBudget,
 		"dereferencePntr":               utils.DereferenceUintPtr,
+		"safeJS":                        utils.SafeJS,
 	}
 	r.SetFuncMap(funcMap)
 

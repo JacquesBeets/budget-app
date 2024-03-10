@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js"></script>
+</head>
+<body>
+    <div id="main" style="width: 100%;height:90%;"></div>
+    <script type="text/javascript">
+        var chart = echarts.init(document.getElementById('main'));
+        var options = {{ .line }};
+        chart.setOption(options);
+    </script>
+</body>
+</html>

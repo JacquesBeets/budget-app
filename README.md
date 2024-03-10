@@ -58,6 +58,7 @@ make clean
 
 ## TODO
 
+- [ ] Look into loading html templates globally
 - [ ] More UI styling
 - [ ] Sort Out Routing on FE
 - [ ] Look at FE Hot Reloading

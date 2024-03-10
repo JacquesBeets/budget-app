@@ -28,6 +28,7 @@ const (
 	BudgetForm                 = "./views/components/budgetform.html"
 	BudgetEdit                 = "./views/components/budgetedit.html"
 	CryptoModal                = "./views/modals/cryptomodal.html"
+	LineChart                  = "./views/components/charts/portfolio_line.html"
 )
 
 const (
@@ -57,15 +58,13 @@ func (ge *GinEngine) ReturnErrorJSON(c *gin.Context, err error) {
 }
 
 func (ge *GinEngine) HomePage(c *gin.Context) {
-
 	r := ge.Router
-
 	// Generate the current timestamp in milliseconds
 	version := time.Now().UnixNano() / int64(time.Millisecond)
 
-	r.LoadHTMLFiles(IndexHTML, SidenavHTML, BodyImportsHTML, HeadImportsHTML)
+	r.LoadHTMLFiles(IndexHTML, SidenavHTML, BodyImportsHTML, HeadImportsHTML, LineChart)
 
-	c.HTML(http.StatusOK, "homepage/index.html", gin.H{
+	c.HTML(http.StatusOK, "views/index.html", gin.H{
 		"Version": fmt.Sprintf("%d", version),
 	})
 }

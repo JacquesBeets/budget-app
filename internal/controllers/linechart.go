@@ -1,37 +1,102 @@
 package controllers
 
 import (
-	"math/rand"
+	"budget-app/internal/models"
+	"budget-app/internal/utils"
+	"encoding/json"
+	"fmt"
+	"html/template"
+	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 )
 
-// generate random data for line chart
-func generateLineItems() []opts.LineData {
-	items := make([]opts.LineData, 0)
-	for i := 0; i < 7; i++ {
-		items = append(items, opts.LineData{Value: rand.Intn(300)})
+func returnOptions(xAxisData []string, seriesData []opts.LineData) map[string]interface{} {
+	// Manually create the chart options
+	options := map[string]interface{}{
+		"grid": map[string]interface{}{
+			"left":         "0%",
+			"right":        "0%",
+			"bottom":       "0%",
+			"top":          "0%",
+			"containLabel": false,
+		},
+		"color": []string{"#FFFFFF"},
+		"tooltip": map[string]interface{}{
+			"show":      true,
+			"formatter": "{b} : R {c}",
+		},
+		"legend": map[string]interface{}{
+			"show": false,
+		},
+		"xAxis": []map[string]interface{}{
+			{
+				"data":  xAxisData,
+				"scale": true,
+				"splitLine": map[string]interface{}{
+					"show": false,
+					"lineStyle": map[string]interface{}{
+						"color":   "white",
+						"opacity": 0.1,
+					},
+				},
+			},
+		},
+		"yAxis": []map[string]interface{}{
+			{
+				"scale": true,
+				"splitLine": map[string]interface{}{
+					"show": true,
+					"lineStyle": map[string]interface{}{
+						"color":   "white",
+						"opacity": 0.1,
+					},
+				},
+			},
+		},
+		"series": []map[string]interface{}{
+			{
+				"name": "Category A",
+				"type": "line",
+				"data": seriesData,
+			},
+		},
 	}
-	return items
+	return options
 }
 
 func (ge *GinEngine) RenderLineChart(c *gin.Context) {
-	// create a new line instance
-	line := charts.NewLine()
-	// set some global options like Title/Legend/ToolTip or anything else
-	// line.SetGlobalOptions(
-	// 	charts.WithInitializationOpts(opts.Initialization{Theme: types.ThemeWesteros}),
-	// 	charts.WithTitleOpts(opts.Title{
-	// 		Title:    "Line example in Westeros theme",
-	// 		Subtitle: "Line chart rendered by the http server this time",
-	// 	}))
+	var chartLabels []string
+	var lineData []opts.LineData
 
-	// Put data into instance
-	line.SetXAxis([]string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}).
-		AddSeries("Category A", generateLineItems()).
-		AddSeries("Category B", generateLineItems()).
-		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: true}))
-	line.Render(c.Writer)
+	var portfolioHistory models.CryptoPortfolioTotalHistories
+	_, err := portfolioHistory.FetchAll(ge.db())
+	if err != nil {
+		ge.ReturnErrorPage(c, err)
+		return
+	}
+
+	for _, history := range portfolioHistory {
+		chartLabels = append(chartLabels, fmt.Sprintf("%d-%s", history.ID, history.CreatedAt.Format("2006-01-02 15:04:05")))
+		lineData = append(lineData, opts.LineData{
+			Value: utils.FormatNumberToTwoDecimalPlaces(history.TotalValueZar),
+		})
+	}
+
+	ge.Router.LoadHTMLFiles(LineChart)
+
+	options := returnOptions(chartLabels, lineData)
+
+	// Convert the chart options to a JSON string
+	optionsJSON, err := json.Marshal(options)
+	if err != nil {
+		log.Fatalf("Error marshaling chart options: %v", err)
+	}
+
+	// Pass the options to your template
+	c.HTML(http.StatusOK, "portfolio_line.html", gin.H{
+		"line": template.JS(optionsJSON),
+	})
 }

@@ -13,13 +13,14 @@ import (
 
 type CryptoCoin struct {
 	gorm.Model
-	CoinGeckoCryptoID   string   `json:"cryptoID"`
-	CryptoName          string   `json:"cryptoName"`
-	CryptoSymbol        *string  `json:"cryptoSymbol"`
-	CryptoAmountHolding *float64 `json:"cryptoAmount"`
-	CryptoPrice         *float64 `json:"cryptoPrice"`
-	CryptoPriceZar      *float64 `json:"cryptoPriceZar"`
-	CurrentValueZar     *float64 `json:"currentValueZar"`
+	CoinGeckoCryptoID      string                    `json:"cryptoID"`
+	CryptoName             string                    `json:"cryptoName"`
+	CryptoSymbol           *string                   `json:"cryptoSymbol"`
+	CryptoAmountHolding    *float64                  `json:"cryptoAmount"`
+	CryptoPrice            *float64                  `json:"cryptoPrice"`
+	CryptoPriceZar         *float64                  `json:"cryptoPriceZar"`
+	CurrentValueZar        *float64                  `json:"currentValueZar"`
+	CryptoPortfolioHistory *CryptoPortfolioHistories `json:"cryptoPortfolioHistory"`
 }
 
 type CryptoCoins []CryptoCoin
@@ -50,6 +51,37 @@ func (c *CryptoCoins) FetchAll(tx *gorm.DB) (*gorm.DB, error) {
 		return response, response.Error
 	}
 	return response, nil
+}
+
+type PortfolioTotal struct {
+	TotalValue    float64 `json:"totalValue"`
+	TotalValueZar float64 `json:"totalValueZar"`
+}
+
+type PortfolioTotalsMap map[int]PortfolioTotal
+
+func (c *CryptoCoins) ReturnPortfolioTotal(tx *gorm.DB) *PortfolioTotal {
+	var total PortfolioTotal
+	totalValue := 0.0
+	totalValueZar := 0.0
+
+	c.FetchAll(tx)
+
+	for _, coin := range *c {
+		if coin.CryptoPrice != nil && coin.CryptoAmountHolding != nil {
+			totalValue += *coin.CryptoPrice * *coin.CryptoAmountHolding
+		}
+		if coin.CryptoPriceZar != nil && coin.CryptoAmountHolding != nil {
+			totalValueZar += *coin.CryptoPriceZar * *coin.CryptoAmountHolding
+		}
+	}
+	total.TotalValue = totalValue
+	total.TotalValueZar = totalValueZar
+	return &total
+}
+
+func (c *CryptoCoins) FetchAllWithHistory(tx *gorm.DB) *gorm.DB {
+	return tx.Preload("CryptoPortfolioHistory").Find(&c)
 }
 
 func (c *CryptoCoins) ReturnAllIds(tx *gorm.DB) (CryptoCoinIDs, error) {

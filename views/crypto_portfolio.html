@@ -21,7 +21,7 @@
                 </span>
             </div>
             <footer class="">
-                <div class="text-2xl">R {{ formatPrice .TotalValue }}</div>
+                <div class="text-2xl noWrap">R {{ formatPrice .TotalValue }}</div>
                 <p class="muted"><small>{{.TotalValuePercentChange}}% from last fetch</small></p>
             </footer>
         </div>
@@ -53,7 +53,7 @@
                 </span>
             </div>
             <footer class="">
-                <div class="text-2xl">
+                <div class="text-2xl noWrap">
                     R {{ formatPrice .BestPerformingCoinPrice }} &bullet; {{ .BestPerformingCoin.CryptoCoin.CryptoName }}
                 </div>
                 <p class="muted">
@@ -66,8 +66,7 @@
         <div class=" card ">
             <div class=" cardHead">
                 <h3 class="">Total Savings</h3>
-                <span>
-                    + 
+                <span> 
                     <svg xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                     stroke-width="2" class="h-4 w-4 text-muted-foreground">
@@ -148,9 +147,7 @@
                 Crypto Porfolio Chart
                 <small class="muted">Some text can go here...</small>
             </h3>
-            <div>
-                <iframe id="addBudget" src="/templates/linechart"  onload="this.style.height=this.contentDocument.body.scrollHeight +'px';" width="100%"></iframe>
-            </div>
+            <div id="cryptoPortfolioChart" hx-get="/templates/linechart" hx-trigger="load" hx-swap="innerHTML"></div>
         </div>
 
     </section>
