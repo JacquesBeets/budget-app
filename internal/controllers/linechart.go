@@ -26,7 +26,7 @@ func returnOptions(xAxisData []string, seriesData []opts.LineData) map[string]in
 		"color": []string{"#FFFFFF"},
 		"tooltip": map[string]interface{}{
 			"show":      true,
-			"formatter": "{b} : R {c}",
+			"formatter": "R {c}",
 		},
 		"legend": map[string]interface{}{
 			"show": false,
@@ -59,7 +59,7 @@ func returnOptions(xAxisData []string, seriesData []opts.LineData) map[string]in
 		"series": []map[string]interface{}{
 			{
 				"name": "Category A",
-				"type": "line",
+				"type": "bar",
 				"data": seriesData,
 			},
 		},
@@ -79,7 +79,7 @@ func (ge *GinEngine) RenderLineChart(c *gin.Context) {
 	}
 
 	for _, history := range portfolioHistory {
-		chartLabels = append(chartLabels, fmt.Sprintf("%d-%s", history.ID, history.CreatedAt.Format("2006-01-02 15:04:05")))
+		chartLabels = append(chartLabels, fmt.Sprintf("%d", history.ID))
 		lineData = append(lineData, opts.LineData{
 			Value: utils.FormatNumberToTwoDecimalPlaces(history.TotalValueZar),
 		})
