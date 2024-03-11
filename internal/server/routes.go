@@ -50,14 +50,16 @@ func HandleViews(r *gin.Engine) {
 	// authenticated.GET("/transactions", controllers.GetTransactions)
 	// authenticated.POST("/transactions", controllers.HandleOFXUpload)
 	r.GET("/", views.HomePage)
+	r.GET("/transactions", views.HomePage) // if browser is refreshed, it will return the same page
+	r.GET("/crypto", views.HomePage)
+	r.GET("/upload", views.HomePage)
+	r.GET("/transactionstypes", views.HomePage)
 
 	r.GET("templates/upload", views.UploadPage)
-	r.GET("/upload", views.UploadPage)
-
 	r.GET("templates/transactions", views.ReturnTransactions)
 	r.GET("templates/transactionstypes", views.ReturnTransactionTypes)
 	r.GET("templates/crypto", views.ReturnCryptoView)
-	r.GET("templates/linechart", views.RenderLineChart)
+
 }
 
 func HandleComponents(r *gin.Engine) {
@@ -67,6 +69,7 @@ func HandleComponents(r *gin.Engine) {
 	r.GET("transactions/download", views.DownloadTransactions)
 	r.GET("components/budget/form", views.ReturnBudgetForm)
 	r.GET("components/budget/:id/edit", views.ReturnBudgetEditForm)
+	r.GET("components/linechart", views.RenderLineChart)
 	r.GET("/crypto/fetch/prices", views.FetchCurrentCrypoPrices)
 
 	// Posts

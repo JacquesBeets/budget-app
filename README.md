@@ -60,7 +60,7 @@ make clean
 
 - [ ] Look into loading html templates globally
 - [ ] More UI styling
-- [ ] Sort Out Routing on FE
+- [x] Sort Out Routing on FE
 - [ ] Look at FE Hot Reloading
 - [ ] Add tests
 - [ ] Auto download and import transactions from bank
@@ -73,7 +73,7 @@ make clean
 - [ ] Add a debt tracker (outside of the banking transactions)
 - [ ] Add a savings tracker
 - [ ] Add a wallet scanner for crypto holdings
-- [ ] Add a crypto holdings history tracker (Adda table to store portfolio value over time - perhaps just save the total evrythime the amounts are updated)
+- [x] Add a crypto holdings history tracker (Adda table to store portfolio value over time - perhaps just save the total evrythime the amounts are updated)
 - [ ] Auto update crypto holdings once a day
 - [ ] Add email report functionality (weekly, monthly)
 - [ ] Add alert if budget item is not yet paid at a certain date
