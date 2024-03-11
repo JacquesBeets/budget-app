@@ -59,7 +59,7 @@ func returnOptions(xAxisData []string, seriesData []opts.LineData) map[string]in
 		"series": []map[string]interface{}{
 			{
 				"name": "Category A",
-				"type": "bar",
+				"type": "line",
 				"data": seriesData,
 			},
 		},

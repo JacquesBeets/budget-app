@@ -52,7 +52,7 @@ func (c *CryptoPortfolioTotalHistories) Create(tx *gorm.DB, totalsMap *Portfolio
 
 func (c *CryptoPortfolioTotalHistories) FetchAll(tx *gorm.DB) (*gorm.DB, error) {
 
-	response := tx.Order("id DESC").Limit(20).Find(&c)
+	response := tx.Order("id DESC").Limit(100).Find(&c)
 
 	// Reverse the order of items in c
 	for i, j := 0, len(*c)-1; i < j; i, j = i+1, j-1 {
