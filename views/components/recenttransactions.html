@@ -63,7 +63,7 @@
         </div>
         <div class=" card ">
             <div class=" cardHead">
-                <h3 class="">Total Savings</h3>
+                <h3 class="">Account Balance</h3>
                 <span>
                     + 
                     <svg xmlns="http://www.w3.org/2000/svg"
@@ -74,8 +74,8 @@
                 </span>
             </div>
             <footer class="">
-                <div class="text-2xl">R 200 000</div>
-                <p class="muted"><small>+201 since last hour</small></p>
+                <div class="text-2xl">R {{ .Balance | formatPrice }}</div>
+                <p class="muted"><small>For current month</small></p>
             </footer>
         </div>
     </section>

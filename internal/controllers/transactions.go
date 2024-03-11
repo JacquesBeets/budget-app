@@ -199,6 +199,7 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 		"BudgetTotal":      budgetTotal,
 		"TotalIncome":      totalIncome,
 		"TotalExpense":     totalExpense,
+		"Balance":          totalIncome + totalExpense,
 		"Transactions":     transactions,
 		"TransactionCount": len(transactions),
 		"BudgetItems":      budetsItems,
