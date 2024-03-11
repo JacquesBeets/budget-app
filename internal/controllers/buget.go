@@ -14,6 +14,11 @@ func (ge *GinEngine) SaveBudgetItem(c *gin.Context) {
 
 	name := c.PostForm("name")
 	amountStr := c.PostForm("amount")
+	importantStr := c.PostForm("important")
+	important := false
+	if importantStr == "true" {
+		important = true
+	}
 
 	// Convert amount to float64
 	amount, err := strconv.ParseFloat(amountStr, 64)
@@ -23,8 +28,9 @@ func (ge *GinEngine) SaveBudgetItem(c *gin.Context) {
 	}
 
 	budget = &models.Budget{
-		Name:   name,
-		Amount: amount,
+		Name:      name,
+		Amount:    amount,
+		Important: important,
 	}
 
 	response := ge.db().Create(budget).Scan(&budget)
@@ -42,6 +48,11 @@ func (ge *GinEngine) UpdateBudgetItem(c *gin.Context) {
 	budgetID := c.Param("id")
 	name := c.PostForm("name")
 	amountStr := c.PostForm("amount")
+	importantStr := c.PostForm("important")
+	important := false
+	if importantStr == "true" {
+		important = true
+	}
 
 	// Convert amount to float64
 	amount, err := strconv.ParseFloat(amountStr, 64)
@@ -60,6 +71,7 @@ func (ge *GinEngine) UpdateBudgetItem(c *gin.Context) {
 	// Update the budget item
 	budget.Name = name
 	budget.Amount = amount
+	budget.Important = important
 	response := ge.db().Model(&budget).Updates(budget).Scan(&budget)
 	if response.Error != nil {
 		ge.ReturnErrorJSON(c, response.Error)

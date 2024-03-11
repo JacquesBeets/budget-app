@@ -7,7 +7,18 @@
         <label for="budget">Amount</label>
         <input type="number" step="0.01" class="form-control" id="amount" name="amount" placeholder="Enter amount" value="{{ .Budget.Amount }}" required>
     </div>
-
+    <div class="form-group">
+        <label for="important">Important</label>
+        <input type="hidden" id="hiddenImportant" name="important" value="{{ .Budget.Important }}">
+        <input type="checkbox" class="form-control" id="checkboxImportant" name="importantCheckbox" {{if .Budget.Important }} checked {{end}} onchange="updateHiddenInput()">
+    </div>
+    <script>
+        function updateHiddenInput() {
+            var checkbox = document.getElementById('checkboxImportant');
+            var hiddenInput = document.getElementById('hiddenImportant');
+            hiddenInput.value = checkbox.checked ? 'true' : 'false';
+        }
+    </script>
     <div>
         <label for="budget">&nbsp;</label>
         <button type="submit" class="btn btn-primary">Update</button>
