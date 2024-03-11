@@ -46,6 +46,7 @@ window.onload = () => {
         htmxMethods.forEach((method) => {
             if(ROUTES_REVERSED[window.location.pathname].key === method.attributes['hx-get'].value){
                 method.click();
+                setTitle(CURRENT_ROUTES[ROUTES_REVERSED[window.location.pathname].key].title);
                 history.replaceState(
                     CURRENT_ROUTES[ROUTES_REVERSED[window.location.pathname].key], 
                     CURRENT_ROUTES[ROUTES_REVERSED[window.location.pathname].key].title, 
