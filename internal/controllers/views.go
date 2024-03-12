@@ -69,6 +69,16 @@ func (ge *GinEngine) HomePage(c *gin.Context) {
 	})
 }
 
+func (ge *GinEngine) StartNewTrace(c *gin.Context) {
+
+	version := time.Now().UnixNano() / int64(time.Millisecond)
+
+	c.JSON(http.StatusOK, gin.H{
+		"Version": fmt.Sprintf("%d", version),
+	})
+	StartNewTrace()
+}
+
 // func (ge *GinEngine) Dashboard(c *gin.Context) {
 // 	r := ge.Router
 

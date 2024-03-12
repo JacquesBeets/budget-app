@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"archive/zip"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -359,4 +360,106 @@ func DownloadFnb() error {
 
 	log.Println("Completed FNB Download")
 	return nil
+}
+
+func StartNewTrace() {
+	/// Launch Playwright
+	pw, err := playwright.Run()
+	assertErrorToNilf("could not launch playwright: %w", err)
+	// Launch Browser with UI
+	// browser, err := pw.Chromium.Launch()
+	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
+		Headless: playwright.Bool(false),
+	})
+	assertErrorToNilf("could not launch Chromium: %w", err)
+
+	defer func() {
+		browser.Close()
+		pw.Stop()
+	}()
+
+	// Create New Page
+	page, err := browser.NewPage()
+	assertErrorToNilf("could not create page: %w", err)
+
+	if _, err = page.Goto("http://localhost:9090/"); err != nil {
+		log.Fatalf("could not goto: %v\n", err)
+	}
+
+	// TODO: Think about possibly injecting a script to listen for clicks and then send the object to the server
+	// We could possibly also post to the server and then the server can handle the rest
+	handle, err := page.EvaluateHandle(`
+	function ListenClick() {
+		return new Promise(function(resolve, reject) {
+			// this works but we need to populate an object of clicks the send it to the server
+			// perhaps we can inject a control to stop listening for clicks and then send the object
+	
+			let clicks = [];
+	
+			// Create a button element
+			var button = document.createElement('button');
+			button.innerText = 'Stop Recording';
+	
+			// position the button and style it
+			button.style.position = 'fixed';
+			button.style.top = '10px';
+			button.style.right = '10px';
+			button.style.zIndex = '9999';
+			button.style.backgroundColor = 'red';
+			button.style.color = 'white';
+	
+			// Append the button to the body
+			document.body.appendChild(button);
+	
+			// Listen for click events on the button
+			button.addEventListener('click', function() {
+				// Resolve the promise with a custom value
+				resolve(clicks);
+			});
+	
+			function getXPath(element) {
+				if (element.id !== '') {
+				  return 'id("' + element.id + '")';
+				}
+				if (element === document.body) {
+				  return element.tagName;
+				}
+			  
+				var ix = 0;
+				var siblings = element.parentNode.childNodes;
+				for (var i = 0; i < siblings.length; i++) {
+				  var sibling = siblings[i];
+				  if (sibling === element) {
+					return getXPath(element.parentNode) + '/' + element.tagName + '[' + (ix + 1) + ']';
+				  }
+				  if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
+					ix++;
+				  }
+				}
+			  }
+		
+		
+			// Listen for click events on the entire document
+			document.addEventListener('click', function(event) {
+			  // Get the XPath of the clicked element
+			  var xpath = getXPath(event.target);
+			  
+			  // Log the XPath
+			  console.log('Clicked element XPath: ' + xpath);
+	
+			  clicks.push(xpath);
+			});
+		  });
+	}
+	`, struct{}{})
+	if err != nil {
+		log.Fatalf("could not acquire JSHandle: %v\n", err)
+	}
+
+	jsonValue, err := handle.JSONValue()
+	if err != nil {
+		log.Fatalf("could not get JSON value: %v\n", err)
+	}
+	fmt.Println("handle", jsonValue)
+
 }
