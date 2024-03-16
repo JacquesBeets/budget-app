@@ -388,6 +388,7 @@ func StartNewTrace() {
 
 	// TODO: Think about possibly injecting a script to listen for clicks and then send the object to the server
 	// We could possibly also post to the server and then the server can handle the rest
+	// npx playwright codegen
 	handle, err := page.EvaluateHandle(`
 	function ListenClick() {
 		return new Promise(function(resolve, reject) {
