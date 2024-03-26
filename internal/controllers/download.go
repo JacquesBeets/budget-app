@@ -181,14 +181,6 @@ func DownloadNed() error {
 
 	time.Sleep(3 * time.Second) // Wait for 2 seconds
 
-	assertErrorToNilf("could not open Enquire by dropdown: %v", page.Locator(`.enquireby-options app-enquiry-dropdown .gd-dropdown .discrp-block`).Click())
-
-	time.Sleep(2 * time.Second) // Wait for 2 seconds
-
-	assertErrorToNilf("could not select Enquire by dropdown: %v", page.Locator(`//*[@id="scroll-page"]/div/div[1]/div/app-landing/section/app-statement-documents-global/div/section/section[2]/div/app-statements-enquiry/form/div/div[1]/app-enquiry-dropdown/div/ul/li[2]`).Click())
-
-	time.Sleep(2 * time.Second) // Wait for 2 seconds
-
 	assertErrorToNilf("could not open Format dropdown: %v", page.Locator(`//*[@id="scroll-page"]/div/div[1]/div/app-landing/section/app-statement-documents-global/div/section/section[2]/div/app-statements-enquiry/form/div/app-enquiry-dropdown/div/div`).Click())
 
 	time.Sleep(2 * time.Second) // Wait for 2 seconds
