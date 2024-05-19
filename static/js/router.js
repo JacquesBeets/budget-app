@@ -26,6 +26,48 @@ const CURRENT_ROUTES = {
     }
 }
 
+window.QUERY_PARAMS = {
+    searchURL: () => {
+        return new URLSearchParams(window.location.search);
+    },
+    all: () => {
+        const urlSearchParams = QUERY_PARAMS.searchURL();
+        const params = Object.fromEntries(urlSearchParams.entries());
+        return params;
+    },
+    allNames: () => {
+        const urlSearchParams = QUERY_PARAMS.searchURL();
+        const params = urlSearchParams.keys();
+        return params;
+    },
+    get: (param) => {
+        const urlSearchParams = QUERY_PARAMS.searchURL();
+        return urlSearchParams.get(param) || null;
+    },
+    set: (param, value) => {
+        const url = new URL(window.location.href);
+        const urlSearchParams = QUERY_PARAMS.searchURL();
+        const params = {
+            ...QUERY_PARAMS.all(),
+            [param]: value
+        }
+
+        for(const key in params){
+            urlSearchParams.set(key, params[key]);
+        }
+
+        url.search = urlSearchParams.toString();
+        history.pushState(url, document.title, url);
+    },
+    remove: (param) => {
+        const url = new URL(window.location.href);
+        const urlSearchParams = QUERY_PARAMS.searchURL();
+        urlSearchParams.delete(param);
+        url.search = urlSearchParams.toString();
+        history.pushState(url, document.title, url);
+    }
+};
+
 const REVERSE_ROUTES = () =>{
     let reverse = {};
     for (const key in CURRENT_ROUTES) {
@@ -55,17 +97,34 @@ window.onload = () => {
             }
         });
     }
-    
-    
-    document.body.addEventListener('htmx:afterOnLoad', (event) => {
-        let requestPath = event.detail.pathInfo.requestPath;
-        if(!CURRENT_ROUTES[requestPath]) return;
 
-        setTitle(CURRENT_ROUTES[requestPath].title);
-        history.pushState(
+
+    document.body.addEventListener('htmx:beforeRequest', (event) => {
+        // Set the title and push the state
+        const requestPath = event.detail.pathInfo.requestPath;
+        
+        // Set Page Title
+        if(CURRENT_ROUTES[requestPath]) setTitle(CURRENT_ROUTES[requestPath].title);
+    
+        // Update the URL and query params
+        const url = CURRENT_ROUTES[requestPath]?.url && CURRENT_ROUTES[requestPath]?.url !== '/' ? new URL(`${window.location.origin}${CURRENT_ROUTES[requestPath]?.url}`) : new URL(window.location.origin);
+        const urlSearchParams = QUERY_PARAMS.searchURL();
+        const params = {
+            ...QUERY_PARAMS.all(),
+            ...event.detail.requestConfig.parameters
+        }
+
+        for(const key in params){
+            urlSearchParams.set(key, params[key]);
+        }
+
+        url.search = urlSearchParams.toString();
+
+        history.replaceState(
             CURRENT_ROUTES[requestPath], 
-            CURRENT_ROUTES[requestPath].title, 
-            CURRENT_ROUTES[requestPath].url
+            CURRENT_ROUTES[requestPath]?.title ?? "BeetsDeBeer - Dashboard", 
+            url
         );
     });
+
 }

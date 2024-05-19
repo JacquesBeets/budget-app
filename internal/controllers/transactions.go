@@ -127,6 +127,7 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 
 	var transactions []models.Transaction
 	response := ge.db().Joins("Budget").Joins("TransactionType").Where(StringQuery, date, StartDayOfMonth, date, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	// response := ge.db().Joins("Budget").Joins("TransactionType").Where(FirstToLastDayOfMonth, date, date).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
 	if response.Error != nil {
 		r.LoadHTMLFiles(ErrorHTML)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
@@ -136,6 +137,7 @@ func (ge *GinEngine) HandleTransctions(c *gin.Context) {
 
 	var budetsItems []models.Budget
 	response = ge.db().Preload("Transactions", StringQuery, date, StartDayOfMonth, date, StartDayOfMonth).Order("amount desc").Find(&budetsItems)
+	// response = ge.db().Preload("Transactions", FirstToLastDayOfMonth, date, date).Order("amount desc").Find(&budetsItems)
 	if response.Error != nil {
 		r.LoadHTMLFiles(ErrorHTML)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": "could not fetch response"})
@@ -226,7 +228,7 @@ func (ge *GinEngine) ReturnTransactions(c *gin.Context) {
 	r.LoadHTMLFiles(Transactions)
 
 	var transactions []models.Transaction
-	response := ge.db().Preload("Budget").Where(StringQuery, date, StartDayOfMonth, date, StartDayOfMonth).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
+	response := ge.db().Preload("Budget").Where(FirstToLastDayOfMonth, date, date).Order("transaction_date desc").Find(&transactions).Scan(&transactions)
 	if response.Error != nil {
 		ge.ReturnErrorPage(c, response.Error)
 		return

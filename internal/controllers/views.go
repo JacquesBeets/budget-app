@@ -32,9 +32,10 @@ const (
 )
 
 const (
-	StartDayOfMonth = "+21 days"
-	DateNow         = "now"
-	StringQuery     = "date(transaction_date) >= date(?, 'start of month', '-1 month', ?) AND date(transaction_date) <= date(?, 'start of month', ?)"
+	StartDayOfMonth       = "+24 days"
+	DateNow               = "now"
+	StringQuery           = "date(transaction_date) >= date(?, 'start of month', '-1 month', ?) AND date(transaction_date) <= date(?, 'start of month', ?)"
+	FirstToLastDayOfMonth = "date(transaction_date) >= date(?, 'start of month') AND date(transaction_date) <= date(?, 'start of month', '+1 month', '-1 day')"
 )
 
 type PageData struct {

@@ -11,7 +11,8 @@
             <input type="month" name="date" id="date" hx-get="/templates/transactions" hx-trigger="change" hx-target="#content" hx-swap="innerHTML">
             <div class="icon">&#x1F4C5;</div>
             <script>
-                document.querySelector('#date').value = new Date().toISOString().slice(0, 7);
+                var selectedDate = QUERY_PARAMS.get('date') ? new Date(QUERY_PARAMS.get('date')).toISOString().slice(0, 7) : new Date().toISOString().slice(0, 7);
+                document.querySelector('#date').value = selectedDate;
             </script>
         </span>
     </div>
