@@ -55,6 +55,21 @@ clean up binary from the last build
 make clean
 ```
 
+# Deployment
+
+```bash
+ssh root@192.168.0.4
+
+cd /app/budget-app
+
+systemctl stop budget-app
+
+git pull
+
+make build
+
+systemctl restart budget-app
+```
 
 ## TODO
 
