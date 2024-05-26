@@ -87,10 +87,10 @@
     
     
     <section class="dashboardContainer">
-        <div class="recentTransactions border">
+        <div class="recentTransactions border dn-mobile">
             <h3>
                 Recent Transactions
-                <small class="muted">The recent stransaction total is R {{ formatPrice .RecentTotal }} out of {{
+                <small class="muted">The recent transaction total is R {{ formatPrice .RecentTotal }} out of {{
                     .TransactionCount
                     }}</small>
             </h3>
@@ -134,7 +134,7 @@
                     Monthly Budget
                     <small class="muted">The recent stransaction total is R {{ formatPrice .BudgetSpent }}</small>
                 </h3>
-                <button hx-get="/components/budget/form" hx-trigger="click" hx-target="#addBudget" hx-swap="innerHTML" class="ml-auto">+ Add</button>
+                <button hx-get="/components/budget/form" hx-trigger="click" hx-target="#addBudget" hx-swap="innerHTML" class="ml-auto  dn-mobile">+ Add</button>
             </header>
             <section id="addBudget"></section>
             <ul>
@@ -152,6 +152,47 @@
                         {{ else }}
                         <small class="success">R {{ formatPrice .TotalTransactionAmount}}</small>
                         {{ end }}
+                    </span>
+                </li>
+                {{ end }}
+            </ul>
+        </div>
+
+        <div class="recentTransactions border dn-desktop">
+            <h3>
+                Recent Transactions
+                <small class="muted">The recent transaction total is R {{ formatPrice .RecentTotal }} out of {{
+                    .TransactionCount
+                    }}</small>
+            </h3>
+        
+            <ul>
+                {{ range .Transactions }}
+                <li>
+                    <span class="flex">
+                        <span class="profilePic">
+                            {{if eq .BankName "FNB"}}
+                            <img src="/static/img/fnb.png" alt="FNB">
+                            {{else}}
+                            <img src="/static/img/nedbank.png" alt="NEDBANK">
+                            {{end}}
+                        </span>
+                        <h5 class="uppercase">
+                            {{if isEmpty .TransactionMemo }}
+                                {{.TransactionName}}
+                            {{else}}
+                                {{.TransactionMemo}}
+                            {{end}}
+                            {{if and .TransactionType .Budget}}
+                            <small class="muted">{{if and .TransactionType}}{{ .TransactionType.Title }}{{end}} {{if and .Budget}}&bullet; {{ .Budget.Name }} {{end}}</small>
+                            {{else}}
+                            <small class="muted">{{if and .TransactionType}}{{ .TransactionType.Title }}{{end}} {{if and .Budget }}{{ .Budget.Name }} {{end}}</small>
+                            {{end}}
+                        </h5>
+                    </span>
+                    <span class="alignRight">
+                        R {{ formatPrice .TransactionAmount }}
+                        <small class="muted">{{ formatDate .TransactionDate}}</small>
                     </span>
                 </li>
                 {{ end }}

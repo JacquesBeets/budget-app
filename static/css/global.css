@@ -172,7 +172,6 @@ img {
     display: block;
 }
 
-
 #content {
     flex: 0 0 89%;
     overflow: hidden;
@@ -184,7 +183,6 @@ ul{
 }
 
 .sideNav ul {
-    
     padding: 0;
 }
 
@@ -342,8 +340,9 @@ button {
 }
 
 .tableContainer .scroll {
+    overflow-x: hidden;
     overflow-y: auto;
-    max-height: 750px;
+    max-height: 650px;
 }
 
 thead {
@@ -468,4 +467,144 @@ svg path{
 #cryptoPortfolioChart{
     padding: 0;
     height: 100%;
+}
+
+.mx-auto{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* Desktop Break Point */
+@media only screen and (min-width: 768px) {
+    .dn-desktop{
+        display: none !important;
+    }
+}
+
+/* Mobile Break Point */
+@media only screen and (max-width: 768px) {
+    /* *{
+        border: red solid 1px;
+    } */
+    html,
+    body{
+        flex-direction: column;
+        /* overflow-x: hidden; */
+    }
+    
+    .sideNav {
+        flex: 100%;
+        text-align: center;
+    }
+    .sideNav .logo{
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .sideNav ul{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    #content{
+        width: 100%;
+        overflow-y: auto;
+    }
+
+    .title{
+        flex-direction: column;
+        padding: 0;
+    }
+
+    .card{
+        flex: 100%;
+    }
+
+    .recentTransactions, .monthlyBudget{
+        width: 100%;
+        margin-bottom: 2rem;
+    }
+    
+    .monthlyBudget h5{
+        pointer-events: none;
+        max-width: 60%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .recentTransactions li{
+        border-bottom: 1px solid #eeeeee52;
+    }
+
+    .recentTransactions h5{
+        max-width: 80%;
+        pointer-events: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    
+    
+    .custom-month-input{
+        display: flex;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        width: 100%;
+        padding: 0;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .custom-month-input button{
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .custom-month-input > div {
+        padding: 0;
+    }
+
+    .custom-month-input input{
+        padding-top: 0.9rem;
+        padding-bottom: 0.9rem;
+    }
+
+    .tableContainer thead{
+        z-index: 100;
+    }
+
+    .tableContainer{
+        max-width: 92vw;
+        padding: 0;
+    }
+
+    .tableContainer tr{
+        display: flex;
+        overflow: hidden;
+    }
+
+    .tableContainer .left{
+        width: 26%;
+    }
+    .tableContainer .right{
+        width: 53%;
+    } 
+
+    .nowrap{
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 60%;
+    }
+    
+
+    /* Helper Classes */
+    .dn-mobile{
+        display: none !important;
+    }
 }
