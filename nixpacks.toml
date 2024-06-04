@@ -1,11 +1,17 @@
 [phases.setup]
 # Install gcc and musl-dev
-apt_packages = ["gcc", "musl-dev"]
+apt_packages = ["gcc", "musl-dev", "curl", "wget"]
+
+[phases.install]
+# Download Go modules
+cmds = ["go mod download"]
+cache_directories = ["/root/.cache/go-build"]
 
 [phases.build]
 # Custom build command
-cmd = "make build"
+cmds = ["go build -o out"]
+cache_directories = ["/root/.cache/go-build"]
 
 [phases.start]
 # Custom start command
-cmd = "/app/bin"
+cmd = "./out"
