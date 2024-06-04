@@ -1,6 +1,17 @@
-FROM golang:1.22.3-alpine
+FROM ubuntu:22.04
 
-RUN apk add --no-cache gcc musl-dev
+
+# Install necessary packages
+RUN apt-get update && apt-get install -y \
+    gcc \
+    musl-dev \
+    golang-1.22-go \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set Go environment variables
+ENV PATH="/usr/lib/go-1.22/bin:${PATH}"
+ENV GOPATH="/go"
+ENV CGO_ENABLED=1
 
 WORKDIR /app
 
