@@ -27,4 +27,4 @@ tmp/
 # .env file
 .env
 # Ignore file named "main" in the root directory without a file extension
-/main
+main

@@ -13,6 +13,17 @@ kill -9 <PID>
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
+## Docker Build
+
+```bash
+sudo docker build . -t finance-app
+```
+## Docker Run
+
+```bash
+sudo docker run -p 9090:9090 finance-app
+```
+
 ## MakeFile
 
 run all make commands with clean tests
