@@ -1,0 +1,11 @@
+[phases.setup]
+# Install gcc and musl-dev
+apt_packages = ["gcc", "musl-dev"]
+
+[phases.build]
+# Custom build command
+cmd = "make build"
+
+[phases.start]
+# Custom start command
+cmd = "/app/bin"
