@@ -110,6 +110,11 @@ func CleanUpDownloads() error {
 }
 
 func StartDownload() {
+	err := playwright.Install()
+	if err != nil {
+		assertErrorToNilf("could not install playwright: %w", err)
+		return
+	}
 	DownloadFnb()
 	DownloadNed()
 }

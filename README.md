@@ -82,6 +82,18 @@ make build
 systemctl restart budget-app
 ```
 
+## CHECK SERVER CONSOLE.LOG LIVE - LIVE
+```bash
+journalctl -u budget-app -f
+```
+
+## CHECK SERVER CONSOLE.LOG ENTRIES
+```bash
+journalctl -u budget-app -n 200 # <!-- LATEST 200 -->
+journalctl -u budget-app --since "2024-02-18 22:00:00" --until "2024-02-21 22:00:00"
+journalctl --vacuum-size=200M  # <!-- (This deletes the sytem logs and clear up hard drive space) -->
+```
+
 ## TODO
 
 - [ ] Look into loading html templates globally
